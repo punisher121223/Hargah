@@ -42,7 +42,7 @@
             border-radius: 4px;
         }
         .pay-btn {
-            background: #004a97; /* رنگ آبی مشابه بانک ملت */
+            background: #004a97;
             color: white;
             border: none;
             padding: 10px;
@@ -62,7 +62,6 @@
 <body>
     <div class="payment-form">
         <div class="logo">
-            <!-- لوگوی پیش‌فرض عمومی -->
             <img src="generic-logo.png" alt="لوگوی پرداخت">
         </div>
         <div class="transaction-info">
@@ -80,7 +79,7 @@
             </div>
             <div class="form-group">
                 <label>تاریخ انقضا</label>
-                <input type="text" placeholder="MMYYYY">
+                <input type="text" id="expiry-date" placeholder="MM/YY" maxlength="5">
             </div>
             <div class="form-group">
                 <label>CVV2</label>
@@ -89,5 +88,16 @@
             <button class="pay-btn">پرداخت</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('expiry-date').addEventListener('input', function(e) {
+            let input = e.target.value;
+            if (input.length === 2 && e.data) {
+                e.target.value = input + '/';
+            } else if (input.length > 5) {
+                e.target.value = input.slice(0, 5);
+            }
+        });
+    </script>
 </body>
 </html>
