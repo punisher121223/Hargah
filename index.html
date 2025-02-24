@@ -44,13 +44,22 @@
             margin-bottom: 5px;
         }
         .request-second-password-box {
-            background: #004a97; /* رنگ آبی پس‌زمینه کادر */
-            color: #000; /* رنگ مشکی متن */
-            padding: 2px 8px; /* فاصله داخلی کادر */
-            border-radius: 4px; /* انحنای گوشه‌ها */
-            margin-left: 10px; /* فاصله از متن "رمز دوم" */
-            font-size: 12px; /* اندازه متن */
+            background: #004a97;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-size: 12px;
             cursor: pointer;
+        }
+        .timer-box {
+            background: #e6f3ff; /* آبی کم‌رنگ */
+            color: #000; /* مشکی */
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-size: 14px;
+            display: none; /* ابتدا مخفی است */
         }
         .form-group input {
             width: 100%;
@@ -75,6 +84,19 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        #success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #e6f3ff; /* آبی کم‌رنگ */
+            color: #004a97; /* آبی تیره */
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -98,7 +120,8 @@
             <div class="form-group">
                 <label>
                     رمز دوم
-                    <span class="request-second-password-box">درخواست رمز دوم</span>
+                    <span class="request-second-password-box" id="requestPassword">درخواست رمز دوم</span>
+                    <span class="timer-box" id="timerBox"></span>
                 </label>
                 <input type="password" placeholder="******">
             </div>
@@ -113,6 +136,7 @@
             <button class="pay-btn">پرداخت</button>
         </form>
     </div>
+    <div id="success-message">درخواست رمز به بانک مبدا ارسال شد</div>
 
     <script>
         document.getElementById('expiry-date').addEventListener('input', function(e) {
@@ -122,6 +146,33 @@
             } else if (input.length > 5) {
                 e.target.value = input.slice(0, 5);
             }
+        });
+
+        const requestPassword = document.getElementById('requestPassword');
+        const timerBox = document.getElementById('timerBox');
+        const successMessage = document.getElementById('success-message');
+
+        requestPassword.addEventListener('click', function() {
+            // نمایش پیام موفقیت
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 2000); // پیام پس از 2 ثانیه پنهان می‌شود
+
+            // نمایش کادر تایمر و شروع شمارش معکوس
+            timerBox.style.display = 'inline-block';
+            let timeLeft = 60; // 1 دقیقه
+            const timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerBox.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                } else {
+                    clearInterval(timer);
+                    timerBox.style.display = 'none';
+                }
+            }, 1000);
         });
     </script>
 </body>
