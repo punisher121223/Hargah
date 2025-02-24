@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>درگاه پرداخت</title>
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 400px;
+            text-align: right;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 100px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .pay-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pay-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="logo.png" alt="لوگو">
+        </div>
+        <form>
+            <div class="form-group">
+                <label>شماره کارت</label>
+                <input type="text" placeholder="---- ---- ---- ----">
+            </div>
+            <div class="form-group">
+                <label>CVV2</label>
+                <input type="text" placeholder="123">
+            </div>
+            <div class="form-group">
+                <label>تاریخ انقضا</label>
+                <input type="text" placeholder="MM/YY">
+            </div>
+            <div class="form-group">
+                <label>رمز دوم</label>
+                <input type="password" placeholder="******">
+            </div>
+            <button class="pay-btn">پرداخت</button>
+        </form>
+    </div>
+</body>
+</html>
