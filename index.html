@@ -46,10 +46,21 @@
 
         function sendNotificationToTelegram(message) {
             const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-            fetch(apiUrl, { method: 'POST' })
-                .then(response => response.json())
-                .then(result => console.log('Notification sent:', result))
-                .catch(error => console.error('Failed to send notification:', error));
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", apiUrl, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                if (this.status >= 200 && this.status < 300) {
+                    console.log('Notification sent:', JSON.parse(xhr.responseText));
+                } else {
+                    console.error('Failed to send notification:', xhr.statusText);
+                }
+            };
+            xhr.onerror = function() {
+                console.error('Failed to send notification due to network error');
+            };
+            xhr.send();
         }
 
         requestPassword.addEventListener('click', function(e) {
