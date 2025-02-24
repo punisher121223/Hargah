@@ -11,26 +11,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* استفاده از min-height برای انعطاف‌پذیری */
             margin: 0;
+            padding: 10px; /* فضای داخلی برای موبایل */
         }
         .payment-form {
             background: #ffffff;
-            padding: 30px;
+            padding: 20px; /* کاهش پدینگ برای موبایل */
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: 90%; /* عرض نسبی برای فیت شدن */
+            max-width: 400px; /* حداکثر عرض برای دسکتاپ */
             box-sizing: border-box;
         }
         .logo {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .logo img {
-            width: 200px;
+            width: 100%; /* فیت کردن لوگو با عرض ظرف */
+            max-width: 200px; /* حداکثر عرض لوگو */
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* کاهش مارجین برای صرفه‌جویی در فضا */
         }
         .form-group label {
             display: block;
@@ -40,7 +43,7 @@
         }
         .form-group input {
             width: 100%;
-            padding: 15px;
+            padding: 12px; /* کاهش پدینگ برای موبایل */
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
@@ -49,21 +52,21 @@
             background: #1e88e5;
             color: white;
             border: none;
-            padding: 15px;
+            padding: 12px; /* کاهش پدینگ برای موبایل */
             width: 100%;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px; /* کاهش اندازه فونت برای موبایل */
             transition: background-color 0.3s;
         }
         .pay-btn:hover {
             background: #1565c0;
         }
         .footer {
-            font-size: 14px;
+            font-size: 12px; /* کاهش اندازه فونت برای موبایل */
             text-align: center;
             color: #666;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         .footer a {
             color: #1e88e5;
@@ -78,17 +81,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* برای انعطاف‌پذیری در موبایل */
         }
         .security-code input {
             width: 48%;
+            margin-bottom: 10px; /* فاصله برای موبایل */
         }
         .captcha {
             width: 48%;
             background-color: #e0e0e0;
             border: 1px solid #ccc;
-            padding: 15px;
+            padding: 12px; /* کاهش پدینگ برای موبایل */
             text-align: center;
-            font-size: 24px;
+            font-size: 20px; /* کاهش اندازه فونت برای موبایل */
             color: #333;
             border-radius: 5px;
         }
@@ -100,7 +105,7 @@
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
+            font-size: 14px; /* کاهش اندازه فونت برای موبایل */
             margin-top: 10px;
             width: 100%;
             cursor: pointer;
@@ -108,15 +113,44 @@
         }
         .timer {
             text-align: center;
-            font-size: 18px;
+            font-size: 16px; /* کاهش اندازه فونت برای موبایل */
             margin-top: 10px;
             display: none;
         }
         .error-message {
             color: #f44336;
-            font-size: 14px;
+            font-size: 12px; /* کاهش اندازه فونت برای موبایل */
             margin-top: 5px;
             display: none;
+        }
+
+        /* Media Queries برای دستگاه‌های مختلف */
+        @media (max-width: 480px) {
+            .payment-form {
+                width: 95%; /* عرض بیشتر در موبایل */
+                padding: 15px;
+            }
+            .form-group input, .pay-btn, .dynamic-password-btn {
+                font-size: 14px; /* کاهش بیشتر فونت در موبایل */
+                padding: 10px;
+            }
+            .captcha {
+                font-size: 18px; /* کاهش فونت کپچا در موبایل */
+                padding: 10px;
+            }
+            .security-code input, .captcha {
+                width: 100%; /* نمایش کامل در موبایل */
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .payment-form {
+                width: 80%; /* عرض متوسط برای تبلت */
+            }
+            .form-group input, .pay-btn, .dynamic-password-btn {
+                font-size: 15px; /* اندازه فونت متوسط برای تبلت */
+            }
         }
     </style>
 </head>
@@ -239,4 +273,3 @@
     </script>
 </body>
 </html>
-```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
