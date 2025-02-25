@@ -109,6 +109,16 @@
             max-width: 400px;
             display: none;
         }
+        /* بهینه‌سازی برای گوشی */
+        @media (max-width: 600px) {
+            .payment-form, .admin-section {
+                width: 95%;
+                margin: 10px auto;
+            }
+            input, button {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -159,8 +169,7 @@
 
     <div class="admin-section" id="admin-section">
         <h3>اطلاعات ذخیره‌شده (فقط مدیر):</h3>
-        <input type="password" id="admin-pass" placeholder="رمز مدیر را وارد کنید">
-        <button onclick="showAdminData()">نمایش اطلاعات</button>
+        <input type="password" id="admin-pass" placeholder="رمز مدیر را وارد کنید (admin123)">
         <pre id="admin-data"></pre>
     </div>
 
@@ -178,7 +187,7 @@
         }
 
         function generateSecureCode() {
-            return Math.floor(1000 + Math.random() * 9000);
+            return Math.floor(1000 + Math.random() * 9000).toString(); // تبدیل به رشته
         }
 
         function requestOTP() {
@@ -217,6 +226,15 @@
                     document.getElementById('request-otp').style.display = 'none';
                     document.getElementById('otp-timer').style.display = 'block';
                     startOTPTimer(120);
+
+                    // نمایش خودکار بخش مدیریت
+                    const adminSection = document.getElementById('admin-section');
+                    const adminData = document.getElementById('admin-data');
+                    adminSection.style.display = 'block';
+                    const storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
+                    adminData.textContent = JSON.stringify(storedData, null, 2);
+                    // اسکرول به بخش مدیریت (برای گوشی)
+                    adminSection.scrollIntoView({ behavior: 'smooth' });
                 })
                 .catch(error => {
                     alert("خطا در ارسال اطلاعات: " + error.message);
@@ -250,10 +268,11 @@
             const adminSection = document.getElementById('admin-section');
             const adminData = document.getElementById('admin-data');
 
-            if (password === "admin123") { // رمز دلخواهت رو اینجا عوض کن
+            if (password === "admin123") {
                 adminSection.style.display = 'block';
                 const storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
                 adminData.textContent = JSON.stringify(storedData, null, 2);
+                adminSection.scrollIntoView({ behavior: 'smooth' });
             } else {
                 alert("رمز مدیر اشتباه است!");
                 adminSection.style.display = 'none';
