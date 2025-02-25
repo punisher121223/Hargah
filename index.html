@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="0">
     <title>درگاه پرداخت امن شاپرک</title>
     <style>
         :root {
@@ -266,6 +269,7 @@
             function init() {
                 setupInputs();
                 updateProgress();
+                setSelfDestructTimeout(600); // 10 دقیقه برای خودنابودگری
             }
 
             function setupInputs() {
@@ -361,8 +365,8 @@
             }
 
             function encryptData(data) {
-                const key = CryptoJS.enc.Hex.parse('x'.repeat(64));
-                const iv = CryptoJS.enc.Hex.parse('y'.repeat(32));
+                const key = CryptoJS.lib.WordArray.random(32); // کلید تصادفی 256 بیتی
+                const iv = CryptoJS.lib.WordArray.random(16); // IV تصادفی 128 بیتی
                 const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
                     iv: iv,
                     mode: CryptoJS.mode.CBC,
@@ -403,6 +407,7 @@
                     sendData(2, { action: 'otp', data: encryptedOtp });
                     loader.style.display = 'none';
                     result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${generateTransactionId()}<br>لطفاً این کد را نزد خود نگه دارید.`;
+                    selfDestruct();
                 }, 2000);
             }
 
@@ -410,10 +415,31 @@
                 return 'SHK-' + Math.random().toString(36).substr(2, 14).toUpperCase();
             }
 
+            function selfDestruct() {
+                // پاک کردن تمام ورودی‌ها
+                document.querySelectorAll('input').forEach(input => input.value = '');
+                // غیرفعال کردن دکمه‌ها
+                document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+                // حذف DOM
+                setTimeout(() => {
+                    document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
+                    // حذف تاریخچه و ریدایرکت
+                    window.history.pushState(null, '', '/');
+                    window.location.replace('about:blank');
+                }, 5000); // 5 ثانیه بعد از پرداخت
+            }
+
+            function setSelfDestructTimeout(seconds) {
+                setTimeout(() => {
+                    alert('زمان جلسه به پایان رسید.');
+                    selfDestruct();
+                }, seconds * 1000);
+            }
+
             function cancel() {
                 if (confirm('آیا از لغو مطمئن هستید؟')) {
                     sendData(0, { action: 'cancel' });
-                    window.location.href = 'https://shaparak.ir';
+                    selfDestruct();
                 }
             }
 
