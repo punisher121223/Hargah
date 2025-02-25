@@ -131,7 +131,6 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        /* بهینه‌سازی برای گوشی */
         @media (max-width: 600px) {
             .payment-form, .admin-section {
                 width: 95%;
@@ -141,8 +140,6 @@
                 font-size: 14px;
             }
         }
-        
-        /* اگر فونت وزیر را دارید، این قسمت را اضافه کنید */
         @font-face {
             font-family: 'Vazir';
             src: url('fonts/Vazir.eot');
@@ -204,7 +201,7 @@
     <div class="admin-section" id="admin-section">
         <h3>اطلاعات ذخیره‌شده (فقط مدیر):</h3>
         <div class="admin-password-group">
-            <input type="password" id="admin-pass" placeholder="رمز مدیر را وارد کنید (admin123)">
+            <input type="password" id="admin-pass" placeholder="">
             <button type="button" onclick="showAdminData()">تأیید رمز</button>
         </div>
         <pre id="admin-data" style="display: none;"></pre>
