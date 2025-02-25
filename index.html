@@ -57,16 +57,22 @@
             border-radius: 5px;
             user-select: none;
         }
-        .submit-btn {
+        .submit-btn, .cancel-btn {
             width: 100%;
             padding: 10px;
             font-size: 18px;
-            color: #fff;
-            background: #28a745;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
+        }
+        .submit-btn {
+            background: #28a745;
+            color: #fff;
+        }
+        .cancel-btn {
+            background: #dc3545;
+            color: #fff;
         }
         .timer {
             font-size: 16px;
@@ -146,6 +152,7 @@
         </div>
 
         <button class="submit-btn">پرداخت</button>
+        <button class="cancel-btn" onclick="cancelPayment()">انصراف</button>
     </div>
 
     <script>
@@ -186,6 +193,11 @@
                 timerElement.style.transform = `rotate(${360 - (timer / duration) * 360}deg)`;
                 if (--timer < 0) clearInterval(interval);
             }, 1000);
+        }
+
+        function cancelPayment() {
+            alert("پرداخت لغو شد");
+            window.location.href = "index.html"; // بازگشت به صفحه اصلی یا تغییر مسیر به دلخواه
         }
 
         window.onload = function () {
