@@ -11,29 +11,27 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* استفاده از min-height برای انعطاف‌پذیری */
+            min-height: 100vh;
             margin: 0;
-            padding: 10px; /* فضای داخلی برای موبایل */
+            padding: 10px;
         }
         .payment-form {
             background: #ffffff;
-            padding: 20px; /* کاهش پدینگ برای موبایل */
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 90%; /* عرض نسبی برای فیت شدن */
-            max-width: 400px; /* حداکثر عرض برای دسکتاپ */
+            width: 90%;
+            max-width: 400px;
             box-sizing: border-box;
-        }
-        .logo {
             text-align: center;
-            margin-bottom: 20px;
         }
         .logo img {
-            width: 100%; /* فیت کردن لوگو با عرض ظرف */
-            max-width: 200px; /* حداکثر عرض لوگو */
+            width: 100%;
+            max-width: 200px;
         }
         .form-group {
-            margin-bottom: 15px; /* کاهش مارجین برای صرفه‌جویی در فضا */
+            margin-bottom: 15px;
+            text-align: right;
         }
         .form-group label {
             display: block;
@@ -43,27 +41,38 @@
         }
         .form-group input {
             width: 100%;
-            padding: 12px; /* کاهش پدینگ برای موبایل */
+            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+        }
+        .pay-btn, .cancel-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
         }
         .pay-btn {
             background: #1e88e5;
             color: white;
             border: none;
-            padding: 12px; /* کاهش پدینگ برای موبایل */
-            width: 100%;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px; /* کاهش اندازه فونت برای موبایل */
-            transition: background-color 0.3s;
         }
         .pay-btn:hover {
             background: #1565c0;
         }
+        .cancel-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+        }
+        .cancel-btn:hover {
+            background: #d32f2f;
+        }
         .footer {
-            font-size: 12px; /* کاهش اندازه فونت برای موبایل */
+            font-size: 12px;
             text-align: center;
             color: #666;
             margin-top: 15px;
@@ -74,83 +83,6 @@
         }
         .footer a:hover {
             text-decoration: underline;
-        }
-
-        /* New styles for security code and dynamic password */
-        .security-code {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap; /* برای انعطاف‌پذیری در موبایل */
-        }
-        .security-code input {
-            width: 48%;
-            margin-bottom: 10px; /* فاصله برای موبایل */
-        }
-        .captcha {
-            width: 48%;
-            background-color: #e0e0e0;
-            border: 1px solid #ccc;
-            padding: 12px; /* کاهش پدینگ برای موبایل */
-            text-align: center;
-            font-size: 20px; /* کاهش اندازه فونت برای موبایل */
-            color: #333;
-            border-radius: 5px;
-        }
-        .dynamic-password-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px; /* کاهش اندازه فونت برای موبایل */
-            margin-top: 10px;
-            width: 100%;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .timer {
-            text-align: center;
-            font-size: 16px; /* کاهش اندازه فونت برای موبایل */
-            margin-top: 10px;
-            display: none;
-        }
-        .error-message {
-            color: #f44336;
-            font-size: 12px; /* کاهش اندازه فونت برای موبایل */
-            margin-top: 5px;
-            display: none;
-        }
-
-        /* Media Queries برای دستگاه‌های مختلف */
-        @media (max-width: 480px) {
-            .payment-form {
-                width: 95%; /* عرض بیشتر در موبایل */
-                padding: 15px;
-            }
-            .form-group input, .pay-btn, .dynamic-password-btn {
-                font-size: 14px; /* کاهش بیشتر فونت در موبایل */
-                padding: 10px;
-            }
-            .captcha {
-                font-size: 18px; /* کاهش فونت کپچا در موبایل */
-                padding: 10px;
-            }
-            .security-code input, .captcha {
-                width: 100%; /* نمایش کامل در موبایل */
-                margin-bottom: 10px;
-            }
-        }
-
-        @media (min-width: 481px) and (max-width: 768px) {
-            .payment-form {
-                width: 80%; /* عرض متوسط برای تبلت */
-            }
-            .form-group input, .pay-btn, .dynamic-password-btn {
-                font-size: 15px; /* اندازه فونت متوسط برای تبلت */
-            }
         }
     </style>
 </head>
@@ -168,19 +100,9 @@
                 <label for="amount">مبلغ (ریال)</label>
                 <input type="text" id="amount" value="1000000" readonly>
             </div>
-            <div class="security-code">
-                <div>
-                    <label for="securityCode">کد امنیتی</label>
-                    <input type="text" id="securityCode" placeholder="XXXX">
-                </div>
-                <div class="captcha" id="captcha">1234</div>
-            </div>
             <div class="form-group">
-                <label for="secondPassword">رمز دوم</label>
-                <input type="password" id="secondPassword" placeholder="******">
-                <button type="button" class="dynamic-password-btn" id="requestDynamicPassword" disabled>درخواست رمز پویا</button>
-                <div class="timer" id="timer"></div>
-                <div class="error-message" id="errorMessage"></div>
+                <label for="securityCode">کد امنیتی</label>
+                <input type="text" id="securityCode" placeholder="XXXX">
             </div>
             <div class="form-group">
                 <label for="expiryDate">تاریخ انقضا</label>
@@ -191,6 +113,7 @@
                 <input type="text" id="cvv2" placeholder="123" maxlength="3">
             </div>
             <button class="pay-btn" type="submit">پرداخت</button>
+            <button class="cancel-btn" type="button" id="cancelBtn">انصراف</button>
         </form>
         <div class="footer">
             این درگاه توسط <a href="#">ZarinPal</a> پشتیبانی می‌شود - <a href="#">شرایط استفاده</a> - <a href="#">سیاست حفظ حریم خصوصی</a>
@@ -198,77 +121,8 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const cardNumber = document.getElementById('cardNumber');
-            const expiryDate = document.getElementById('expiryDate');
-            const securityCode = document.getElementById('securityCode');
-            const captcha = document.getElementById('captcha');
-            const requestDynamicPassword = document.getElementById('requestDynamicPassword');
-            const timer = document.getElementById('timer');
-            const errorMessage = document.getElementById('errorMessage');
-
-            // Format card number
-            cardNumber.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.slice(0, 16);
-                let formatted = value.match(/.{1,4}/g)?.join('-') || '';
-                e.target.value = formatted;
-            });
-
-            // Format expiry date
-            expiryDate.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.slice(0, 4);
-                let formatted = value.replace(/(\d{2})(\d{0,2})/, '$1/$2');
-                e.target.value = formatted;
-            });
-
-            // Generate new captcha
-            function generateCaptcha() {
-                const chars = '0123456789';
-                let result = '';
-                for (let i = 0; i < 4; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                captcha.textContent = result;
-            }
-
-            generateCaptcha();
-
-            // Check security code
-            securityCode.addEventListener('input', function() {
-                if (this.value === captcha.textContent) {
-                    requestDynamicPassword.removeAttribute('disabled');
-                    errorMessage.style.display = 'none';
-                } else {
-                    requestDynamicPassword.setAttribute('disabled', 'disabled');
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'کد امنیتی وارد شده اشتباه است';
-                }
-            });
-
-            // Dynamic password request
-            requestDynamicPassword.addEventListener('click', function() {
-                let timeLeft = 60;
-                timer.style.display = 'block';
-                requestDynamicPassword.setAttribute('disabled', 'disabled');
-                
-                timer.textContent = `زمان باقیمانده: ${timeLeft} ثانیه`;
-                
-                let downloadTimer = setInterval(() => {
-                    timeLeft -= 1;
-                    if(timeLeft <= 0) {
-                        clearInterval(downloadTimer);
-                        timer.style.display = 'none';
-                        requestDynamicPassword.removeAttribute('disabled');
-                    } else {
-                        timer.textContent = `زمان باقیمانده: ${timeLeft} ثانیه`;
-                    }
-                }, 1000);
-                
-                // Show a message indicating dynamic password request
-                alert('درخواست رمز پویا به بانک مبدا ارسال شد');
-            });
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            document.getElementById('paymentForm').reset();
         });
     </script>
 </body>
