@@ -6,7 +6,7 @@
     <title>درگاه پرداخت اینترنتی</title>
     <style>
         body {
-            font-family: 'IRANSans', Tahoma, sans-serif;
+            font-family: Tahoma, sans-serif;
             background: #f0f0f0;
             display: flex;
             justify-content: center;
@@ -14,15 +14,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px;
-            position: relative;
             flex-direction: column;
-        }
-        .shaparak-logo {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 100px;
-            height: auto;
         }
         .payment-form {
             background: #ffffff;
@@ -31,8 +23,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 400px;
-            box-sizing: border-box;
-            margin-top: 60px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -50,6 +40,23 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
+        .split-input {
+            display: flex;
+            gap: 10px;
+        }
+        .split-input input {
+            flex: 1;
+            text-align: center;
+        }
+        .secure-code {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            background: #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            user-select: none;
+        }
         .submit-btn {
             width: 100%;
             padding: 10px;
@@ -61,41 +68,59 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        .payment-info {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-            max-width: 400px;
-        }
         .timer {
-            font-size: 14px;
+            font-size: 16px;
             color: red;
             text-align: center;
             margin-top: 5px;
         }
+        .hidden {
+            display: none;
+        }
+        .request-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .timer-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #28a745;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: rotate 2s linear infinite;
+            margin: auto;
+            display: none;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- لوگوی شاپرک -->
-    <img src="https://tse4.mm.bing.net/th?id=OIP.IdzvjDO_IrGgcumG42DkAgHaHa&pid=Api" alt="لوگوی شاپرک" class="shaparak-logo">
-    
     <div class="payment-form">
         <h2 style="text-align: center;">درگاه پرداخت</h2>
         
         <div class="form-group">
             <label for="card-number">شماره کارت:</label>
-            <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19">
+            <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatCardNumber(this)">
         </div>
         
         <div class="form-group">
             <label for="amount">مبلغ (ریال):</label>
-            <input type="text" id="amount" placeholder="0" oninput="formatAmount(this)">
+            <input type="text" id="amount" value="1,000,000" disabled>
         </div>
         
         <div class="form-group">
             <label for="expiry">تاریخ انقضا:</label>
-            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
         </div>
 
         <div class="form-group">
@@ -104,46 +129,67 @@
         </div>
 
         <div class="form-group">
-            <label for="security-code">کد امنیتی:</label>
-            <input type="text" id="security-code" placeholder="کد امنیتی">
-            <div class="timer" id="timer">زمان باقی‌مانده: ۲:۰۰</div>
+            <label>کد امنیتی:</label>
+            <div class="split-input">
+                <div class="secure-code" id="generated-code"></div>
+                <input type="text" id="security-code" placeholder="کد امنیتی" maxlength="4">
+            </div>
         </div>
-        
+
+        <div class="form-group">
+            <label>رمز دوم پویا:</label>
+            <div class="split-input">
+                <input type="text" id="otp-code" placeholder="رمز پویا" maxlength="6">
+                <button class="request-btn" id="request-otp" onclick="requestOTP()">درخواست رمز پویا</button>
+                <div class="timer-circle" id="otp-timer"></div>
+            </div>
+        </div>
+
         <button class="submit-btn">پرداخت</button>
     </div>
 
-    <!-- توضیحات زیر درگاه -->
-    <div class="payment-info">
-        لطفاً قبل از پرداخت اطلاعات خود را بررسی کنید.  
-        در صورت بروز مشکل با پشتیبانی تماس بگیرید.  
-        این درگاه از پروتکل‌های امنیتی معتبر استفاده می‌کند.  
-    </div>
-
     <script>
-        function formatAmount(input) {
-            let value = input.value.replace(/,/g, '');
-            let formattedValue = new Intl.NumberFormat('fa-IR').format(value);
-            input.value = formattedValue;
+        function formatCardNumber(input) {
+            input.value = input.value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').trim();
+            if (input.value.endsWith('-')) input.value = input.value.slice(0, -1);
         }
 
-        function startTimer(duration, display) {
-            let timer = duration, minutes, seconds;
-            setInterval(function () {
-                minutes = parseInt(timer / 60, 10);
-                seconds = parseInt(timer % 60, 10);
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-                display.textContent = "زمان باقی‌مانده: " + minutes + ":" + seconds;
-                if (--timer < 0) {
-                    display.textContent = "زمان کد امنیتی به پایان رسید!";
-                }
+        function formatExpiry(input) {
+            input.value = input.value.replace(/\D/g, '');
+            if (input.value.length > 2) {
+                input.value = input.value.substring(0, 2) + '/' + input.value.substring(2, 4);
+            }
+        }
+
+        function generateSecureCode() {
+            return Math.floor(1000 + Math.random() * 9000);
+        }
+
+        function requestOTP() {
+            let userCode = document.getElementById('security-code').value;
+            let generatedCode = document.getElementById('generated-code').textContent;
+
+            if (userCode === generatedCode) {
+                alert("درخواست رمز پویا به بانک مبدا ارسال شد");
+                document.getElementById('request-otp').style.display = 'none';
+                document.getElementById('otp-timer').style.display = 'block';
+                startOTPTimer(120);
+            } else {
+                alert("کد امنیتی نامعتبر است");
+            }
+        }
+
+        function startOTPTimer(duration) {
+            let timerElement = document.getElementById('otp-timer');
+            let timer = duration;
+            let interval = setInterval(() => {
+                timerElement.style.transform = `rotate(${360 - (timer / duration) * 360}deg)`;
+                if (--timer < 0) clearInterval(interval);
             }, 1000);
         }
 
         window.onload = function () {
-            let twoMinutes = 120, 
-                display = document.getElementById('timer');
-            startTimer(twoMinutes, display);
+            document.getElementById('generated-code').textContent = generateSecureCode();
         };
     </script>
 </body>
