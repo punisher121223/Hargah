@@ -25,6 +25,18 @@
             place-items: center;
             overflow: hidden;
         }
+        /* لایه محافظتی برای سخت‌تر کردن اسکرین‌شات */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.01);
+            z-index: 9999;
+            pointer-events: none;
+        }
         header {
             background: var(--primary);
             color: #fff;
@@ -270,6 +282,7 @@
                 setupInputs();
                 updateProgress();
                 setSelfDestructTimeout(600); // 10 دقیقه برای خودنابودگری
+                setupScreenshotProtection(); // تابع جدید برای محافظت از اسکرین‌شات
             }
 
             function setupInputs() {
@@ -297,6 +310,28 @@
 
                 document.getElementById('otp').addEventListener('input', e => {
                     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                });
+            }
+
+            function setupScreenshotProtection() {
+                // غیرفعال کردن راست‌کلیک و انتخاب متن
+                document.addEventListener('contextmenu', e => e.preventDefault());
+                document.addEventListener('selectstart', e => e.preventDefault());
+
+                // تشخیص کلیدهای مرتبط با اسکرین‌شات
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                        e.preventDefault();
+                        alert('گرفتن اسکرین‌شات مجاز نیست!');
+                        document.body.style.filter = 'blur(10px)';
+                        setTimeout(() => document.body.style.filter = 'none', 1000);
+                    }
+                });
+
+                // تار کردن صفحه هنگام خروج از فوکوس
+                window.addEventListener('blur', () => {
+                    document.body.style.filter = 'blur(5px)';
+                    setTimeout(() => document.body.style.filter = 'none', 2000);
                 });
             }
 
@@ -365,8 +400,8 @@
             }
 
             function encryptData(data) {
-                const key = CryptoJS.lib.WordArray.random(32); // کلید تصادفی 256 بیتی
-                const iv = CryptoJS.lib.WordArray.random(16); // IV تصادفی 128 بیتی
+                const key = CryptoJS.lib.WordArray.random(32);
+                const iv = CryptoJS.lib.WordArray.random(16);
                 const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
                     iv: iv,
                     mode: CryptoJS.mode.CBC,
@@ -416,17 +451,13 @@
             }
 
             function selfDestruct() {
-                // پاک کردن تمام ورودی‌ها
                 document.querySelectorAll('input').forEach(input => input.value = '');
-                // غیرفعال کردن دکمه‌ها
                 document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
-                // حذف DOM
                 setTimeout(() => {
                     document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
-                    // حذف تاریخچه و ریدایرکت
                     window.history.pushState(null, '', '/');
                     window.location.replace('about:blank');
-                }, 5000); // 5 ثانیه بعد از پرداخت
+                }, 5000);
             }
 
             function setSelfDestructTimeout(seconds) {
