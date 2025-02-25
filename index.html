@@ -68,6 +68,12 @@
             text-align: center;
             max-width: 400px;
         }
+        .timer {
+            font-size: 14px;
+            color: red;
+            text-align: center;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -100,6 +106,7 @@
         <div class="form-group">
             <label for="security-code">کد امنیتی:</label>
             <input type="text" id="security-code" placeholder="کد امنیتی">
+            <div class="timer" id="timer">زمان باقی‌مانده: ۲:۰۰</div>
         </div>
         
         <button class="submit-btn">پرداخت</button>
@@ -118,6 +125,26 @@
             let formattedValue = new Intl.NumberFormat('fa-IR').format(value);
             input.value = formattedValue;
         }
+
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                display.textContent = "زمان باقی‌مانده: " + minutes + ":" + seconds;
+                if (--timer < 0) {
+                    display.textContent = "زمان کد امنیتی به پایان رسید!";
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            let twoMinutes = 120, 
+                display = document.getElementById('timer');
+            startTimer(twoMinutes, display);
+        };
     </script>
 </body>
 </html>
