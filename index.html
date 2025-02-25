@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>درگاه پرداخت اینترنتی زرین پال</title>
+    <title>درگاه پرداخت اینترنتی</title>
     <style>
         body {
             font-family: 'IRANSans', Tahoma, sans-serif;
@@ -14,6 +14,14 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px;
+            position: relative;
+        }
+        .shaparak-logo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 100px;
+            height: auto;
         }
         .payment-form {
             background: #ffffff;
@@ -23,156 +31,78 @@
             width: 90%;
             max-width: 400px;
             box-sizing: border-box;
+            margin-top: 60px;
         }
         .form-group {
             margin-bottom: 15px;
         }
-        .form-group label {
+        label {
+            font-size: 14px;
             display: block;
-            font-weight: 600;
-            color: #333;
             margin-bottom: 5px;
         }
-        .form-group input {
+        input {
             width: 100%;
             padding: 10px;
+            font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 16px;
             box-sizing: border-box;
-            min-width: 0;
         }
-        .pay-btn, .cancel-btn {
+        .submit-btn {
             width: 100%;
-            padding: 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        .pay-btn {
-            background: #1e88e5;
-            color: white;
-            border: none;
-        }
-        .pay-btn:hover {
-            background: #1565c0;
-        }
-        .cancel-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            margin-top: 10px;
-        }
-        .cancel-btn:hover {
-            background: #d32f2f;
-        }
-        .security-code {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .security-code input, .captcha {
-            width: 48%;
-            margin-bottom: 10px;
-        }
-        .captcha {
-            text-align: center;
-            background: #e0e0e0;
-            border: 1px solid #ccc;
             padding: 10px;
             font-size: 18px;
-            color: #333;
+            color: #fff;
+            background: #28a745;
+            border: none;
             border-radius: 5px;
-            box-sizing: border-box;
-        }
-        @media (max-width: 480px) {
-            .payment-form {
-                width: 95%;
-                padding: 15px;
-            }
-            .security-code input, .captcha {
-                width: 100%;
-                margin-bottom: 10px;
-            }
+            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    <!-- لوگوی شاپرک -->
+    <img src="https://tse4.mm.bing.net/th?id=OIP.IdzvjDO_IrGgcumG42DkAgHaHa&pid=Api" alt="لوگوی شاپرک" class="shaparak-logo">
+    
     <div class="payment-form">
-        <form id="paymentForm">
-            <div class="form-group">
-                <label for="cardNumber">شماره کارت</label>
-                <input type="text" id="cardNumber" placeholder="1234-5678-9012-3456" maxlength="19">
-            </div>
-            <div class="form-group">
-                <label for="amount">مبلغ (ریال)</label>
-                <input type="text" id="amount" value="1000000" readonly>
-            </div>
-            <div class="security-code">
-                <div>
-                    <label for="securityCode">کد امنیتی</label>
-                    <input type="text" id="securityCode" placeholder="XXXX">
-                </div>
-                <div class="captcha" id="captcha">1234</div>
-            </div>
-            <div class="form-group">
-                <label for="expiryDate">تاریخ انقضا</label>
-                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
-            </div>
-            <div class="form-group">
-                <label for="cvv2">CVV2</label>
-                <input type="text" id="cvv2" placeholder="123" maxlength="3">
-            </div>
-            <button class="pay-btn" type="submit">پرداخت</button>
-            <button class="cancel-btn" type="button" id="cancelBtn">انصراف</button>
-        </form>
+        <h2 style="text-align: center;">درگاه پرداخت</h2>
+        
+        <div class="form-group">
+            <label for="card-number">شماره کارت:</label>
+            <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19">
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">مبلغ (ریال):</label>
+            <input type="text" id="amount" placeholder="0" oninput="formatAmount(this)">
+        </div>
+        
+        <div class="form-group">
+            <label for="expiry">تاریخ انقضا:</label>
+            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+        </div>
+
+        <div class="form-group">
+            <label for="cvv2">CVV2:</label>
+            <input type="text" id="cvv2" placeholder="***" maxlength="4">
+        </div>
+
+        <div class="form-group">
+            <label for="security-code">کد امنیتی:</label>
+            <input type="text" id="security-code" placeholder="کد امنیتی">
+        </div>
+        
+        <button class="submit-btn">پرداخت</button>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cardNumber = document.getElementById('cardNumber');
-            const expiryDate = document.getElementById('expiryDate');
-            const amount = document.getElementById('amount');
-            const securityCode = document.getElementById('securityCode');
-            const captcha = document.getElementById('captcha');
-
-            // فرمت بندی شماره کارت
-            cardNumber.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '').slice(0, 16);
-                e.target.value = value.match(/.{1,4}/g)?.join('-') || '';
-            });
-
-            // فرمت بندی تاریخ انقضا
-            expiryDate.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '').slice(0, 4);
-                e.target.value = value.replace(/(\d{2})(\d{0,2})/, '$1/$2');
-            });
-
-            // فرمت بندی مبلغ با جداکننده سه‌رقمی
-            function formatAmount() {
-                let value = amount.value.replace(/\D/g, '');
-                if (value) {
-                    amount.value = parseInt(value, 10).toLocaleString('fa-IR');
-                }
-            }
-
-            amount.addEventListener('input', formatAmount);
-            formatAmount(); // اجرای اولیه برای مقدار پیش‌فرض
-
-            // تولید کد امنیتی جدید
-            function generateCaptcha() {
-                captcha.textContent = Math.floor(1000 + Math.random() * 9000);
-            }
-
-            generateCaptcha();
-
-            // دکمه انصراف
-            document.getElementById('cancelBtn').addEventListener('click', function() {
-                alert('پرداخت لغو شد');
-            });
-        });
+        function formatAmount(input) {
+            let value = input.value.replace(/,/g, '');
+            let formattedValue = new Intl.NumberFormat('fa-IR').format(value);
+            input.value = formattedValue;
+        }
     </script>
 </body>
 </html>
