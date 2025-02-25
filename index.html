@@ -6,7 +6,7 @@
     <title>درگاه پرداخت اینترنتی</title>
     <style>
         body {
-            font-family: Tahoma, sans-serif;
+            font-family: 'Vazir', 'Tahoma', sans-serif;
             background: #f0f0f0;
             display: flex;
             justify-content: center;
@@ -15,6 +15,7 @@
             margin: 0;
             padding: 10px;
             flex-direction: column;
+            direction: rtl;
         }
         .payment-form {
             background: #ffffff;
@@ -23,6 +24,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 400px;
+            direction: rtl;
         }
         .form-group {
             margin-bottom: 15px;
@@ -39,6 +41,8 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
+            direction: rtl;
+            text-align: right;
         }
         .split-input {
             display: flex;
@@ -108,6 +112,24 @@
             width: 90%;
             max-width: 400px;
             display: none;
+            direction: rtl;
+        }
+        .admin-password-group {
+            display: flex;
+            gap: 10px;
+        }
+        .admin-password-group input {
+            flex: 2;
+        }
+        .admin-password-group button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
         /* بهینه‌سازی برای گوشی */
         @media (max-width: 600px) {
@@ -118,6 +140,18 @@
             input, button {
                 font-size: 14px;
             }
+        }
+        
+        /* اگر فونت وزیر را دارید، این قسمت را اضافه کنید */
+        @font-face {
+            font-family: 'Vazir';
+            src: url('fonts/Vazir.eot');
+            src: url('fonts/Vazir.eot?#iefix') format('embedded-opentype'),
+                 url('fonts/Vazir.woff2') format('woff2'),
+                 url('fonts/Vazir.woff') format('woff'),
+                 url('fonts/Vazir.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
         }
     </style>
 </head>
@@ -169,8 +203,11 @@
 
     <div class="admin-section" id="admin-section">
         <h3>اطلاعات ذخیره‌شده (فقط مدیر):</h3>
-        <input type="password" id="admin-pass" placeholder="رمز مدیر را وارد کنید (admin123)">
-        <pre id="admin-data"></pre>
+        <div class="admin-password-group">
+            <input type="password" id="admin-pass" placeholder="رمز مدیر را وارد کنید (admin123)">
+            <button type="button" onclick="showAdminData()">تأیید رمز</button>
+        </div>
+        <pre id="admin-data" style="display: none;"></pre>
     </div>
 
     <script>
@@ -187,7 +224,7 @@
         }
 
         function generateSecureCode() {
-            return Math.floor(1000 + Math.random() * 9000).toString(); // تبدیل به رشته
+            return Math.floor(1000 + Math.random() * 9000).toString();
         }
 
         function requestOTP() {
@@ -207,12 +244,10 @@
                     "timestamp": new Date().toISOString()
                 };
 
-                // ذخیره اطلاعات در localStorage
                 let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
                 storedData.push(jsonData);
                 localStorage.setItem('paymentData', JSON.stringify(storedData));
 
-                // ارسال به سرور
                 fetch('https://reqres.in/api/users', {
                     method: 'POST',
                     headers: {
@@ -227,13 +262,8 @@
                     document.getElementById('otp-timer').style.display = 'block';
                     startOTPTimer(120);
 
-                    // نمایش خودکار بخش مدیریت
                     const adminSection = document.getElementById('admin-section');
-                    const adminData = document.getElementById('admin-data');
                     adminSection.style.display = 'block';
-                    const storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
-                    adminData.textContent = JSON.stringify(storedData, null, 2);
-                    // اسکرول به بخش مدیریت (برای گوشی)
                     adminSection.scrollIntoView({ behavior: 'smooth' });
                 })
                 .catch(error => {
@@ -265,17 +295,15 @@
 
         function showAdminData() {
             const password = document.getElementById('admin-pass').value;
-            const adminSection = document.getElementById('admin-section');
             const adminData = document.getElementById('admin-data');
 
             if (password === "admin123") {
-                adminSection.style.display = 'block';
                 const storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
                 adminData.textContent = JSON.stringify(storedData, null, 2);
-                adminSection.scrollIntoView({ behavior: 'smooth' });
+                adminData.style.display = 'block';
             } else {
                 alert("رمز مدیر اشتباه است!");
-                adminSection.style.display = 'none';
+                adminData.style.display = 'none';
             }
         }
 
